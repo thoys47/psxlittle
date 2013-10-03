@@ -28,10 +28,9 @@ public class BootReceiver extends BroadcastReceiver {
 			param.sParam = PSXService.BOOT;
 			param.clParam = CNAME;
 			aTask.execute(param);
+			PSXShared pShared = new PSXShared(context);
+			pShared.putBefore(Calendar.getInstance());
 		}
-		
-		PSXShared pShared = new PSXShared(context);
-		pShared.putBefore(Calendar.getInstance());
 		
 		RegistTask rTask = new RegistTask(context);
 		rTask.StartCommand();

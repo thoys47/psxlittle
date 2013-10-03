@@ -43,4 +43,20 @@ public class PSXShared {
 		editor.commit();
 	}
 
+	public void putInterval(int interval){
+		SharedPreferences preferences = getSharedPrefs();
+		
+		Editor editor = preferences.edit();
+		editor.putInt(PSXService.INTERVAL, interval);
+		editor.commit();
+	}
+
+	public void putLength(int length){
+		SharedPreferences preferences = getSharedPrefs();
+		
+		Editor editor = preferences.edit();
+		editor.putInt(PSXService.LENGTH, length);
+		editor.commit();
+	}
+
 }

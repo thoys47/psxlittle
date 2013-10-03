@@ -109,6 +109,8 @@ public class MainActivity extends FragmentActivity {
 			mParam.sParam = PSXService.INSTALL;
 			mParam.clParam = CNAME;
 			aTask.execute(mParam);
+
+			pShared.putBefore(Calendar.getInstance());
 		}
 		
 		IntentFilter iFilter = new IntentFilter();

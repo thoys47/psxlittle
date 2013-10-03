@@ -15,15 +15,57 @@
         android:textAppearance="@style/listMidium" />
 
     <RadioGroup
+        android:id="@+id/radioCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/lblCount"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radioInfo"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/strInfo" />
+
+        <RadioButton
+            android:id="@+id/radioPrev"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/strPrev" />
+
+    </RadioGroup>
+    
+    <TextView
+        android:id="@+id/lblLength"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/radioInterval"
+        android:text="@string/strLength"
+        android:layout_marginLeft="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:textAppearance="@style/listMidium" />
+    
+    <TextView
+        android:id="@+id/lblCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/lblLength"
+        android:layout_below="@+id/lblLength"
+        android:layout_marginTop="36dp"
+        android:text="@string/strCount"
+        android:textAppearance="@style/listMidium" />
+
+    <RadioGroup
         android:id="@+id/radioInterval"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="@dimen/margin_h"
-        android:layout_marginRight="@dimen/margin_h"
-        android:layout_marginTop="@dimen/margin_v"
-        android:layout_toRightOf="@+id/lblInterval"
+        android:layout_below="@+id/lblInterval"
         android:orientation="horizontal" >
 
         <RadioButton
@@ -49,40 +91,5 @@
             android:text="@string/str20" />
     </RadioGroup>
 
-    <TextView
-        android:id="@+id/lblCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/lblInterval"
-        android:layout_marginLeft="@dimen/margin_h"
-        android:layout_marginTop="@dimen/margin_v"
-        android:text="@string/strCount"
-        android:textAppearance="@style/listMidium" />
-
-    <RadioGroup
-        android:id="@+id/radioCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/radioInterval"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/radioInfo"
-            style="@style/listMidium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/strInfo" />
-
-        <RadioButton
-            android:id="@+id/radioPrev"
-            style="@style/listMidium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/strPrev" />
-
-    </RadioGroup>
 
 </RelativeLayout>

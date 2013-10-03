@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import jp.thoy.psxlittle.R;
 
@@ -86,11 +87,9 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		try{
 			DataObject dObject = new DataObject(mContext);
 			
-			String sql = "select datetime,rtime,rsize from " + DataObject.INFOTABLE + " where key = '" + params[0].key + "' order by datetime";
-			if(key.equals("system") || key.equals("root")) {
-				sql = "select datetime,sum(rtime),sum(rsize) from " + DataObject.INFOTABLE + " where key = '" + params[0].key
-						+"' group by datetime" + " order by datetime";
-			}
+			String sql = "select datetime,ttime/rtime,tsize/rsize from " + DataObject.INFOTABLE
+					+ " where key = '" + params[0].key + "' order by datetime";
+			
 			SQLiteDatabase mdb = dObject.dbOpen();
 			Cursor cursor = dObject.dbQuery(mdb, sql);
 			mdb.close();
@@ -100,13 +99,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			if(isDebug){
 				Log.w(CNAME,"cnt=" + cursor.getCount());
 			}
-			Calendar calendar = Calendar.getInstance();
+			
+			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			PSXShared pShared = new PSXShared(mContext);
 			int length = pShared.getLength();
 			int interval = pShared.getInterval();
 			calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
 			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND)); 
-			int totalnum = (length * 60) / interval - 1;
+			int totalnum = (length * 60) / interval;
 			int datanum = cursor.getCount();
 			chartSettings.x = new ArrayList<Date[]>();
 			//chartSettings.x = new ArrayList<String[]>();
@@ -114,28 +114,32 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			Date[] x = new Date[totalnum];
 			//String[] x = new String[totalnum];
 			double[] values = new double[totalnum];
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
 			if(isDebug){
 				Log.w(CNAME,"datanum = " + datanum + " totalnum = " + totalnum);
 			}
-			int j = 0;
+			//int j = 0;
 			int lost = 0;
+			//Calendar xcalendar = Calendar.getInstance();
+			//xcalendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+			//xcalendar.add(Calendar.SECOND, (-1) * xcalendar.get(Calendar.SECOND)); 
 			//Log.w(CNAME,"0=" + format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG)));
+
+			calendar.getTimeInMillis()
 			for(int i = 0; i < totalnum;i++){
-				x[i] = format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));
-				//x[i] = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
-				long dat = CommTools.strToMillis(cursor.getString(0));
-				//Log.w(CNAME,"db date=" + cursor.getString(0));
-				Log.w(CNAME,"dat=" + cursor.getString(0) + " " + CommTools.millisToStr(calendar.getTimeInMillis()) + " ~ " + CommTools.millisToStr(calendar.getTimeInMillis() + interval * 60L * 1000L));
-				Log.w(CNAME,"name=" + key + " i=" + i + " j=" + j + " ttime=" + cursor.getString(1));
-				if(dat >= calendar.getTimeInMillis() && dat < calendar.getTimeInMillis() + interval * 60L * 1000L){
+				x[i] = calendar.getTime();
+
+				String fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+				calendar.add(Calendar.MINUTE, interval);
+				String tString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+				
+				if(cursor.getString(0).compareTo(fString) >= 0 && cursor.getString(0).compareTo(tString) <= 0){
 					switch(page){
 					case 0:
-						values[i] = Double.parseDouble(cursor.getString(1));
+						values[i] = Double.parseDouble(cursor.getString(1)) * 100.0;
 						break;
 					case 1:
-						values[i] = Double.parseDouble(cursor.getString(2));
+						values[i] = Double.parseDouble(cursor.getString(2)) * 100.0;
 						break;
 					}
 					if(chartSettings.max < (int)((values[i] * 1.3) + 0.5)){
@@ -144,22 +148,21 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 					if(isDebug){
 						//Log.w(CNAME,"time=" + cursor.getString(0) + " v=" + cursor.getString(1));
 					}
-					j++;
-					if(j < cursor.getCount()){
+					if(cursor.getPosition() < cursor.getCount() - 1){
 						cursor.moveToNext();
 					}
 					lost = i;
 				} else {
 					if(isDebug) {
-						Log.w(CNAME,"check 2 lost=" + lost + " j=" + j + " pos=" + cursor.getPosition());
+						//Log.w(CNAME,"check 2 lost=" + lost + " j=" + j + " pos=" + cursor.getPosition());
 					}
-					if(lost == i - 1 && j < cursor.getCount()){
-						j++;
+					if(lost == i - 1 && cursor.getPosition() < cursor.getCount() - 1){
 						cursor.moveToNext();
 					}
 					values[i] = 0.0;
 				}
-				calendar.add(Calendar.MINUTE, interval);
+				//calendar.add(Calendar.MINUTE, interval);
+				//xcalendar.add(Calendar.MINUTE, interval);
 			}
 			//Log.w(CNAME,"n=" + format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG)));
 			if(chartSettings.max < 1){

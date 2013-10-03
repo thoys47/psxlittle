@@ -33,31 +33,19 @@ public class PSXService extends Service {
 		Context context = getApplicationContext();
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(context));
 		CNAME = CommTools.getLastPart(context.getClass().getName(),".");
-		
-		SharedPreferences mPreference = context.getSharedPreferences(PSXService.PREFILENAME,Activity.MODE_PRIVATE);
-		int interval = mPreference.getInt(PSXService.INTERVAL,PSXService.DEFINTER);
-		Calendar calendar = Calendar.getInstance();
 
-		if(isDebug){
-			interval = 10;
-			Log.w(CNAME,"action = " + String.valueOf((int)(calendar.get(Calendar.MINUTE) % interval)) + ":" + intent.getAction());
-			TraceLog saveLog = new TraceLog(context);
-			saveLog.saveDebug(String.valueOf((int)(calendar.get(Calendar.MINUTE) % interval)) + ":" + intent.getAction());
-		}
+		//if((calendar.get(Calendar.MINUTE) % interval) == 0  || checkBefore(context,interval)) {
+		PSXAsyncTask aTask = new PSXAsyncTask();
+		Param  mParam = new Param();
+		ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
+		mParam.cParam = context;
+		mParam.aParam = mActivityManager;
+		mParam.sParam = intent.getAction();
+		mParam.clParam = CNAME;
+		aTask.execute(mParam);
 
-		if((calendar.get(Calendar.MINUTE) % interval) == 0  || checkBefore(context,interval)) {
-			PSXAsyncTask aTask = new PSXAsyncTask();
-			Param  mParam = new Param();
-			ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
-			mParam.cParam = context;
-			mParam.aParam = mActivityManager;
-			mParam.sParam = intent.getAction();
-			mParam.clParam = CNAME;
-			aTask.execute(mParam);
-			Editor editor = mPreference.edit();
-			editor.putLong(PSXService.BEFORE, calendar.getTimeInMillis());
-			editor.commit();
-		}
+		PSXShared pShared = new PSXShared(context);
+		pShared.putBefore(Calendar.getInstance());
 
 		/*
 		RegistTask rTask = new RegistTask(context);

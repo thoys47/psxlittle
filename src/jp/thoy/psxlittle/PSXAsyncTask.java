@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -31,7 +32,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 
 		ArrayList<InfoTable> prevList = new ArrayList<InfoTable>();
 		ArrayList<InfoTable> finalList = new ArrayList<InfoTable>();
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		String execFrom = param[0].sParam;
 		mContext = param[0].cParam;
 		TraceLog saveTrace = new TraceLog(mContext);
@@ -214,13 +215,15 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 								Log.e(CNAME,"Too many Items in previnfo");
 							}
 							finalList.get(i).ttime = finalList.get(i).utime + finalList.get(i).stime;
-							double ttmp = (double)(finalList.get(i).ttime * 100) / (double)totalTime;
-							finalList.get(i).rtime = (double)((int)((ttmp * 100) + 0.5)) / 100;
-							double stmp = (double)(finalList.get(i).tsize * 100) / (double)totalSize;
-							finalList.get(i).rsize = (double)((int)((stmp * 100) + 0.5)) / 100;
-							if(finalList.get(i).rsize > 100){
-								Log.e(CNAME,"name=" + finalList.get(i).name + " totalSize" + totalSize + " rsime=" + finalList.get(i).rsize);
-							}
+							finalList.get(i).rtime = (double)totalTime;
+							finalList.get(i).rsize = (double)totalSize;
+							//double ttmp = (double)(finalList.get(i).ttime * 100) / (double)totalTime;
+							//finalList.get(i).rtime = (double)((int)((ttmp * 100) + 0.5)) / 100;
+							//double stmp = (double)(finalList.get(i).tsize * 100) / (double)totalSize;
+							//finalList.get(i).rsize = (double)((int)((stmp * 100) + 0.5)) / 100;
+							//if(finalList.get(i).rsize > 100){
+							//	Log.e(CNAME,"name=" + finalList.get(i).name + " totalSize" + totalSize + " rsime=" + finalList.get(i).rsize);
+							//}
 							//ntotalTime += finalList.get(i).ttime;
 						}
 						if(isDebug){
@@ -264,7 +267,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			ex.printStackTrace();
 			result.bResult = false;
 		}
-		
+		result.bResult = true;
 		return result;
 	}
 

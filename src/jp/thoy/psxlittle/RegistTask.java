@@ -31,6 +31,7 @@ public class RegistTask {
 
 		PSXShared pShared = new PSXShared(mContext);
 		int interval = pShared.getInterval();
+		
 		Calendar calendar = Calendar.getInstance();
 
 		calendar.add(Calendar.MINUTE, interval - (calendar.get(Calendar.MINUTE) % interval));

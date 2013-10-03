@@ -20,7 +20,11 @@
     <string name="str10">10min</string>
     <string name="str15">15min</string>
     <string name="str20">20min</string>
-    <string name="strCount">Toast Count</string>
+    <string name="strLength">How Long?</string>
+    <string name="strlen12">12hrs</string>
+    <string name="strlen24">24hrs</string>
+    <string name="strlen48">48hrs</string>
+	<string name="strCount">Toast Count</string>
     <string name="strInfo">InfoTable</string>
     <string name="strPrev">PrevTable</string>
     

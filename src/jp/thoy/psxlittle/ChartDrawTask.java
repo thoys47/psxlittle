@@ -125,7 +125,6 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			//xcalendar.add(Calendar.SECOND, (-1) * xcalendar.get(Calendar.SECOND)); 
 			//Log.w(CNAME,"0=" + format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG)));
 
-			calendar.getTimeInMillis()
 			for(int i = 0; i < totalnum;i++){
 				x[i] = calendar.getTime();
 

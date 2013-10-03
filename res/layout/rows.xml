@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/cpuBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+    	android:height="2dp"
+    	android:layout_marginTop="4dp"
+    	android:background="#FFFFFF"
+        android:text="" />
+    
+    <ImageView
+        android:id="@+id/imgIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/cpuBar"
+        android:contentDescription="@string/lblDescription"
+        android:maxHeight="48dp"
+        android:maxWidth="48dp"
+        android:src="@drawable/ic_launcher" />
+
+    <TextView
+        android:id="@+id/textAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imgIcon"
+        android:layout_toRightOf="@+id/imgIcon"
+        android:layout_marginLeft="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxEms="8"
+        android:text=""
+        android:textAppearance="@style/listLarge" />
+    
+    <TextView
+        android:id="@+id/textCPUUse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cpuBar"
+        android:text=""
+        android:textAppearance="@style/listMidium" />
+
+    <TextView
+        android:id="@+id/textSysName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textAppName"
+        android:layout_toRightOf="@+id/imgIcon"
+        android:layout_marginLeft="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:text=""
+        android:textAppearance="@style/listSmall" />
+    
+    <TextView
+        android:id="@+id/textKey"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:layout_below="@+id/cpuBar"
+        android:layout_alignParentRight="true"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textSize="12sp"
+        android:textColor="#000000"
+        android:text="" />
+    
+</RelativeLayout>

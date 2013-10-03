@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/lblInterval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:text="@string/strInterval"
+        android:textAppearance="@style/listMidium" />
+
+    <RadioGroup
+        android:id="@+id/radioInterval"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_h"
+        android:layout_marginRight="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:layout_toRightOf="@+id/lblInterval"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radio10"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/str10" />
+
+        <RadioButton
+            android:id="@+id/radio15"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str15" />
+
+        <RadioButton
+            android:id="@+id/radio20"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str20" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/lblCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/lblInterval"
+        android:layout_marginLeft="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:text="@string/strCount"
+        android:textAppearance="@style/listMidium" />
+
+    <RadioGroup
+        android:id="@+id/radioCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/radioInterval"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radioInfo"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/strInfo" />
+
+        <RadioButton
+            android:id="@+id/radioPrev"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/strPrev" />
+
+    </RadioGroup>
+
+</RelativeLayout>

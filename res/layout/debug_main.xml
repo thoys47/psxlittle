@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RadioGroup
+        android:id="@+id/radioDebug"
+        style="@style/debugStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/debugTrace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+    	    style="@style/debugStyle"
+            android:text="@string/lblTrace" />
+
+	    <RadioButton
+	        android:id="@+id/debugLog"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        style="@style/debugStyle"
+	        android:text="@string/lblDebug" />
+	    
+	    </RadioGroup>
+
+    <ListView
+        android:id="@+id/listDebug"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/radioDebug" >
+
+    </ListView>
+
+</RelativeLayout>

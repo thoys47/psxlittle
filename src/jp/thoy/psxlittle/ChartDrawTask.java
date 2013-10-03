@@ -96,9 +96,6 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			if(cursor == null || cursor.getCount() == 0){
 				return null;
 			}
-			if(isDebug){
-				Log.w(CNAME,"cnt=" + cursor.getCount());
-			}
 			
 			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 			PSXShared pShared = new PSXShared(mContext);
@@ -109,21 +106,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			int totalnum = (length * 60) / interval;
 			int datanum = cursor.getCount();
 			chartSettings.x = new ArrayList<Date[]>();
-			//chartSettings.x = new ArrayList<String[]>();
 			chartSettings.values = new ArrayList<double[]>();
 			Date[] x = new Date[totalnum];
-			//String[] x = new String[totalnum];
 			double[] values = new double[totalnum];
 
 			if(isDebug){
 				Log.w(CNAME,"datanum = " + datanum + " totalnum = " + totalnum);
 			}
-			//int j = 0;
 			int lost = 0;
-			//Calendar xcalendar = Calendar.getInstance();
-			//xcalendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-			//xcalendar.add(Calendar.SECOND, (-1) * xcalendar.get(Calendar.SECOND)); 
-			//Log.w(CNAME,"0=" + format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG)));
 
 			for(int i = 0; i < totalnum;i++){
 				x[i] = calendar.getTime();
@@ -144,33 +134,19 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 					if(chartSettings.max < (int)((values[i] * 1.3) + 0.5)){
 						chartSettings.max = (int)((values[i] * 1.3) + 0.5);
 					}
-					if(isDebug){
-						//Log.w(CNAME,"time=" + cursor.getString(0) + " v=" + cursor.getString(1));
-					}
 					if(cursor.getPosition() < cursor.getCount() - 1){
 						cursor.moveToNext();
 					}
 					lost = i;
 				} else {
-					if(isDebug) {
-						//Log.w(CNAME,"check 2 lost=" + lost + " j=" + j + " pos=" + cursor.getPosition());
-					}
 					if(lost == i - 1 && cursor.getPosition() < cursor.getCount() - 1){
 						cursor.moveToNext();
 					}
 					values[i] = 0.0;
 				}
-				//calendar.add(Calendar.MINUTE, interval);
-				//xcalendar.add(Calendar.MINUTE, interval);
 			}
-			//Log.w(CNAME,"n=" + format.parse(CommTools.CalendarToString(calendar, CommTools.DATETIMELONG)));
 			if(chartSettings.max < 1){
 				chartSettings.max = 1;
-			}
-			if(isDebug){
-				for(int i = 0; i < totalnum;i++){
-					//Log.w(CNAME,"x[i]=" + x[i] + " v=" + values[i]);
-				}
 			}
 			chartSettings.x.add(x);
 			chartSettings.values.add(values);

@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity {
 
-	public static final int TAB_NUM = 2;
+	public static final int TAB_NUM = 3;
 	public final static String K_PAGE = "PAGE";
 	public final static String K_KEY = "KEY";
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");

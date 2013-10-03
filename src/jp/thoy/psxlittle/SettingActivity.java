@@ -98,6 +98,7 @@ public class SettingActivity extends Activity {
 				}
 				PSXShared pShared = new PSXShared(getApplicationContext());
 				pShared.putLength(length);
+				Toast.makeText(getApplicationContext(), "len=" + length, Toast.LENGTH_SHORT).show();
 			}
 		});
 

@@ -17,25 +17,43 @@ public class SettingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.setting_main);
 		Context context = getApplicationContext();
-		SharedPreferences mPreference = context.getSharedPreferences(PSXService.PREFILENAME,Activity.MODE_PRIVATE);
-		int interval = mPreference.getInt(PSXService.INTERVAL,10);
+		PSXShared pShared = new PSXShared(context);
+		int interval = pShared.getInterval();
+		int length = pShared.getLength();
 
 		RadioGroup rInterval = (RadioGroup)findViewById(R.id.radioInterval);
 		RadioGroup rCount = (RadioGroup)findViewById(R.id.radioCount);
+		RadioGroup rLength = (RadioGroup)findViewById(R.id.radioLength);
 	
 		switch(interval){
-		case 10:
+		case PSXService.MIN10:
 			rInterval.check(R.id.radio10);
 			break;
-		case 15:
+		case PSXService.MIN15:
 			rInterval.check(R.id.radio15);
 			break;
-		case 20:
+		case PSXService.MIN20:
 			rInterval.check(R.id.radio20);
 			break;
 		default:
 			;
 		}
+		
+		switch(length){
+		case PSXService.HOUR12:
+			rLength.check(R.id.radiolen12);
+			break;
+		case PSXService.HOUR24:
+			rLength.check(R.id.radiolen24);
+			break;
+		case PSXService.HOUR48:
+			rLength.check(R.id.radiolen48);
+			break;
+		default:
+			;
+				
+		}
+		
 		rInterval.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			
 			@Override
@@ -44,21 +62,42 @@ public class SettingActivity extends Activity {
 				int interval;
 				switch(checkedId){
 					case R.id.radio10:
-						interval = 10;
+						interval = PSXService.MIN10;
 						break;
 					case R.id.radio15:
-						interval = 15;
+						interval = PSXService.MIN15;
 						break;
 					case R.id.radio20:
-						interval = 20;
+						interval = PSXService.MIN20;
 						break;
 					default:
 						interval = 10;	
 				}
-	            SharedPreferences mPreferences = getSharedPreferences(PSXService.PREFILENAME,MODE_PRIVATE);
-	            Editor mEdit = mPreferences.edit();
-	            mEdit.putInt(PSXService.INTERVAL,interval);
-	            mEdit.commit();
+				PSXShared pShared = new PSXShared(getApplicationContext());
+				pShared.putInterval(interval);
+			}
+		});
+
+		rInterval.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO 自動生成されたメソッド・スタブ
+				int length;
+				switch(checkedId){
+					case R.id.radiolen12:
+						length = PSXService.HOUR12;
+						break;
+					case R.id.radiolen24:
+						length = PSXService.HOUR24;
+						break;
+					case R.id.radiolen48:
+						length = PSXService.HOUR48;
+						break;
+					default:
+						length = 24;	
+				}
+				PSXShared pShared = new PSXShared(getApplicationContext());
+				pShared.putLength(length);
 			}
 		});
 

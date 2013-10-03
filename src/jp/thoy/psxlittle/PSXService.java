@@ -26,6 +26,13 @@ public class PSXService extends Service {
 	public final static long DEFBEF = 0L;
 	public final static String LASTEXEC = "LastExec";
 	public final static String PREFILENAME = "psxprefer";
+	public final static int MIN10 = 10;
+	public final static int MIN15 = 15;
+	public final static int MIN20 = 20;
+	public final static int HOUR12 = 12;
+	public final static int HOUR24 = 24;
+	public final static int HOUR48 = 48;
+	
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {

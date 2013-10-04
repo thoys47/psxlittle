@@ -25,7 +25,7 @@ import android.widget.LinearLayout;
 
 public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = true;
+	private final static boolean isDebug = false;
 	
 	Context mContext;
 	ProgressDialog pDialog;

@@ -9,13 +9,10 @@ import jp.thoy.psxlittle.R;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -36,7 +33,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 	public final static String K_PAGE = "PAGE";
 	public final static String K_KEY = "KEY";
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = true;
+	private final static boolean isDebug = false;
 	
 	final static Calendar calendar = Calendar.getInstance();
 	final static int year = calendar.get(Calendar.YEAR);

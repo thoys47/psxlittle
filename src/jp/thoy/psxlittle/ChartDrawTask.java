@@ -87,8 +87,20 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		try{
 			DataObject dObject = new DataObject(mContext);
 			
+			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			PSXShared pShared = new PSXShared(mContext);
+			int length = pShared.getLength();
+			int interval = pShared.getInterval();
+			calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND)); 
+			String fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+
 			String sql = "select datetime,ttime/rtime,tsize/rsize from " + DataObject.INFOTABLE
-					+ " where key = '" + params[0].key + "' order by datetime";
+					+ " where key = '" + params[0].key + "' and datetime >= '" + fString + "'"
+					+ " order by datetime";
+			if(isDebug){
+				Log.w(CNAME,sql);
+			}
 			
 			SQLiteDatabase mdb = dObject.dbOpen();
 			Cursor cursor = dObject.dbQuery(mdb, sql);
@@ -97,12 +109,6 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				return null;
 			}
 			
-			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-			PSXShared pShared = new PSXShared(mContext);
-			int length = pShared.getLength();
-			int interval = pShared.getInterval();
-			calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND)); 
 			int totalnum = (length * 60) / interval;
 			int datanum = cursor.getCount();
 			chartSettings.x = new ArrayList<Date[]>();
@@ -118,11 +124,17 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			for(int i = 0; i < totalnum;i++){
 				x[i] = calendar.getTime();
 
-				String fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+				fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 				calendar.add(Calendar.MINUTE, interval);
 				String tString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+				if(isDebug){
+					Log.w(CNAME,"data=" + cursor.getString(0) + " fString=" + fString + " tString=" + tString);
+				}
 				
 				if(cursor.getString(0).compareTo(fString) >= 0 && cursor.getString(0).compareTo(tString) <= 0){
+					if(isDebug){
+						Log.w(CNAME,"data=" + cursor.getString(1));
+					}
 					switch(page){
 					case 0:
 						values[i] = Double.parseDouble(cursor.getString(1)) * 100.0;

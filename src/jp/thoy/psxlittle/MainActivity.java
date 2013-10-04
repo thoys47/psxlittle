@@ -196,6 +196,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 			}
 			if(adapter != null && mListView != null){
 				mListView.setAdapter(adapter);
+				mListView.setOnItemClickListener(this);
+				mListView.setOnItemLongClickListener(this);
 			}
 			break;
 		case R.id.action_debug:

@@ -174,12 +174,10 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				}
 				mListView = (ListView)findViewById(ids[vPager.getCurrentItem()]);
 				adapter = new ListAdapter(this,list,pManager);
-				list = iCalc.calculate(null,1);
+				list = iCalc.calculate(null,vPager.getCurrentItem());
 				if(list == null){
 					return super.onMenuItemSelected(featureId, item);
 				}
-				mListView = (ListView)findViewById(R.id.listMEM);
-				adapter = new ListAdapter(this,list,pManager);
 				break;
 			case 2:
 				IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);

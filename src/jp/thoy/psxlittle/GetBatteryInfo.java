@@ -7,6 +7,7 @@ public class GetBatteryInfo {
 	public final static String STATUS_CHARGE = "Charge";
 	public final static String STATUS_DISCHARGE = "Discharge";
 	public final static String STATUS_FULL = "Full";
+	public final static String PLUGGED_NONE = "UNPLUGGED";
 	public final static String PLUGGED_AC = "AC";
 	public final static String PLUGGED_USB = "USB";
 	public final static String PLUGGED_WIRELESS = "WIRELESS";

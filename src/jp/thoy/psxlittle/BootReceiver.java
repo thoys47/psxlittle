@@ -38,13 +38,13 @@ public class BootReceiver extends BroadcastReceiver {
 		}
 		if(intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)){
 			storeBatteryInfo(context,intent);
+		} else {
+			RegistTask rTask = new RegistTask(context);
+			rTask.StartCommand();
+			TraceLog saveLog = new TraceLog(context);
+			saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));
 		}
 		
-		RegistTask rTask = new RegistTask(context);
-		rTask.StartCommand();
-
-		TraceLog saveLog = new TraceLog(context);
-		saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));
 		if(isDebug) Log.w(CNAME,"action=" + intent.getAction());
 	}
 	

@@ -185,7 +185,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				TextView tLebel = (TextView)findViewById(R.id.txtBattery);
 				tLebel.setText(String.valueOf(bInfo.rLevel) + " %");
 				TextView tTemp = (TextView)findViewById(R.id.txtTemp);
-				tTemp.setText(String.valueOf(bInfo.temp) + " ");
+				tTemp.setText(String.valueOf((double)bInfo.temp / (double)10.0) + " ");
 				TextView tPlugged = (TextView)findViewById(R.id.txtPlugged);
 				tPlugged.setText(bInfo.plugged + " ");
 				TextView tCharge = (TextView)findViewById(R.id.txtCharge);

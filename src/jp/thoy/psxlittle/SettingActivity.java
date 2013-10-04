@@ -78,7 +78,7 @@ public class SettingActivity extends Activity {
 			}
 		});
 
-		rInterval.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		rLength.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				// TODO 自動生成されたメソッド・スタブ
@@ -98,7 +98,6 @@ public class SettingActivity extends Activity {
 				}
 				PSXShared pShared = new PSXShared(getApplicationContext());
 				pShared.putLength(length);
-				Toast.makeText(getApplicationContext(), "len=" + length, Toast.LENGTH_SHORT).show();
 			}
 		});
 

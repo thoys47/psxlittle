@@ -29,17 +29,17 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		try{
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.INFOTABLE));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.PREVINFO));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.BATTINFO));
 			mdb.execSQL(DataObject.maketempSQL("CREATE",DataObject.TEMPCPU));
 			mdb.execSQL(DataObject.maketempSQL("CREATE",DataObject.TEMPMEM));
 			mdb.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILCPU));
 			mdb.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILMEM));
 			mdb.execSQL("CREATE INDEX INFO_IDX01 ON " + DataObject.INFOTABLE + "(DATETIME)");
 			mdb.execSQL("CREATE INDEX INFO_IDX02 ON " + DataObject.INFOTABLE + "(KEY)");
-			mdb.execSQL("CREATE INDEX INFO_IDX03 ON " + DataObject.INFOTABLE + "(TTIME)");
-			mdb.execSQL("CREATE INDEX INFO_IDX04 ON " + DataObject.INFOTABLE + "(TSIZE)");
-			mdb.execSQL("CREATE INDEX INFO_IDX05 ON " + DataObject.INFOTABLE + "(RTIME)");
-			mdb.execSQL("CREATE INDEX INFO_IDX06 ON " + DataObject.INFOTABLE + "(RSIZE)");
 			mdb.execSQL("CREATE INDEX PREV_IDX02 ON " + DataObject.PREVINFO + "(PID)");
+			mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + DataObject.PREVINFO + "(NAME)");
+			mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + DataObject.BATTINFO + "(DATETIME)");
+			mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + DataObject.BATTINFO + "(NAME)");
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -51,13 +51,18 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) throws SQLException {
+	public void onUpgrade(SQLiteDatabase mdb, int oldVersion, int newVersion) throws SQLException {
 		// TODO 自動生成されたメソッド・スタブ
 		try{
-			if(oldVersion == 3){
-				db.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILCPU));
-				db.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILMEM));
-				db.execSQL("CREATE INDEX PREV_IDX02 ON " + DataObject.PREVINFO + "(PID)");
+			if(oldVersion == 1){
+				mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.BATTINFO));
+				mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + DataObject.PREVINFO + "(NAME)");
+				mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + DataObject.BATTINFO + "(DATETIME)");
+				mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + DataObject.BATTINFO + "(NAME)");
+				mdb.execSQL("DROP INDEX INFO_IDX03");
+				mdb.execSQL("DROP INDEX INFO_IDX04");
+				mdb.execSQL("DROP INDEX INFO_IDX05");
+				mdb.execSQL("DROP INDEX INFO_IDX06");
 			}
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);

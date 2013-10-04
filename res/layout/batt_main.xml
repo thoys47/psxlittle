@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <TextView
+        android:id="@+id/battBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+    	android:height="2dp"
+    	android:layout_marginTop="4dp"
+    	android:background="#FFFFFF"
+        android:text="" />
+    
+    <TextView
+        android:id="@+id/txtBattery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/battBar"
+        android:layout_marginRight="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:text=""
+        android:textAppearance="@style/listMidium"
+        />
+
+    <TextView
+        android:id="@+id/txtTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/battBar"
+        android:layout_toLeftOf="@+id/txtBattery"
+        android:layout_marginRight="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:textAppearance="@style/listMidium"
+        android:text=""
+        />
+    
+	<TextView
+	    android:id="@+id/txtPlugged"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/battBar"
+	    android:layout_toLeftOf="@+id/txtTemp"
+        android:layout_marginRight="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:textAppearance="@style/listMidium"
+	    android:text=""
+	    />
+
+	<TextView
+	    android:id="@+id/txtCharge"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/battBar"
+	    android:layout_toLeftOf="@+id/txtPlugged"
+        android:layout_marginRight="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:textAppearance="@style/listMidium"
+	    android:text=""
+	    />
+	
+	<LinearLayout
+		android:id="@+id/battery_area"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" />
+
+	
+</RelativeLayout>

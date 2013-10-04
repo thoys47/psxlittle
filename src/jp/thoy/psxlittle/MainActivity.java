@@ -15,6 +15,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -23,11 +24,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
 
 	public static final int TAB_NUM = 3;
 	public final static String K_PAGE = "PAGE";
@@ -118,6 +121,7 @@ public class MainActivity extends FragmentActivity {
 		iFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
 		iFilter.addAction(Intent.ACTION_TIME_CHANGED);
 		iFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+		iFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
 
 		BootReceiver mReceiver = new BootReceiver();
 		try{
@@ -149,80 +153,55 @@ public class MainActivity extends FragmentActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		// TODO 自動生成されたメソッド・スタブ
 		Intent mIntent;
-
+		Context context = getApplicationContext();
+		ArrayList<TempTable> list;
+		ListAdapter adapter;
+		ListView mListView;
+		int ids[] = new int[]{R.id.listCPU,R.id.listMEM};
+		
 		switch(item.getItemId()){
 		case R.id.action_reload:
 			ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
 			PackageManager pManager = getPackageManager();
-			SummarizeData iCalc = new SummarizeData(getApplicationContext());
-			ArrayList<TempTable> list;
-			ListAdapter adapter;
-			ListView mListView;
 			switch(vPager.getCurrentItem()){
 			case 0:
-				list = iCalc.calculate(null,0);
+			case 1:
+				SummarizeData iCalc = new SummarizeData(context);
+				list = iCalc.calculate(null,vPager.getCurrentItem());
 				if(list == null){
-					Toast.makeText(getApplicationContext(), getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
 					return super.onMenuItemSelected(featureId, item);
 				}
-				mListView = (ListView)findViewById(R.id.listCPU);
+				mListView = (ListView)findViewById(ids[vPager.getCurrentItem()]);
 				adapter = new ListAdapter(this,list,pManager);
-				break;
-			case 1:
 				list = iCalc.calculate(null,1);
 				if(list == null){
-					Toast.makeText(getApplicationContext(), getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
 					return super.onMenuItemSelected(featureId, item);
 				}
 				mListView = (ListView)findViewById(R.id.listMEM);
 				adapter = new ListAdapter(this,list,pManager);
 				break;
+			case 2:
+				IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+				Intent intent = context.registerReceiver(null, ifilter);
+				GetBatteryInfo batteryInfo = new GetBatteryInfo();
+				BatteryInfo bInfo = batteryInfo.getInfo(intent);
+				
+				TextView tLebel = (TextView)findViewById(R.id.txtBattery);
+				tLebel.setText(String.valueOf(bInfo.rLevel) + " %");
+				TextView tTemp = (TextView)findViewById(R.id.txtTemp);
+				tTemp.setText(String.valueOf(bInfo.temp) + " ");
+				TextView tPlugged = (TextView)findViewById(R.id.txtPlugged);
+				tPlugged.setText(bInfo.plugged + " ");
+				TextView tCharge = (TextView)findViewById(R.id.txtCharge);
+				tCharge.setText(bInfo.status + " ");
 			default :
 				mListView = null;
 				adapter = null;
 			}
-			mListView.setAdapter(adapter);
-			mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view,
-						int position, long id) {
-					// TODO 自動生成されたメソッド・スタブ
-					TextView tView = (TextView)view.findViewById(R.id.textKey);
-					ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
-					Intent mIntent;
-					if(isDebug) Log.w(CNAME,"getText=" + tView.getText());
-					if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
-						mIntent = new Intent(view.getContext(),ChartActivity.class);
-						mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-						mIntent.putExtra("KEY",tView.getText());
-						startActivity(mIntent);
-					} else {
-						mIntent = new Intent(view.getContext(),DetailActivity.class);
-						mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-						mIntent.putExtra("KEY",tView.getText());
-						startActivity(mIntent);
-					}
-				}
-			});
-
-			mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-				@Override
-				public boolean onItemLongClick(AdapterView<?> parent, View view,
-						int position, long id) {
-					// TODO 自動生成されたメソッド・スタブ
-					PackageManager pManager = getPackageManager();
-					TextView tView = (TextView)view.findViewById(R.id.textSysName);
-					Intent intent = pManager.getLaunchIntentForPackage((tView.getText()).toString());
-					try{
-						startActivity(intent);
-					} catch (Exception ex) {
-						Toast.makeText(view.getContext(), getString(R.string.strDontExec), Toast.LENGTH_SHORT).show();
-					}
-					return false;
-				}
-				
-			});
+			if(adapter != null && mListView != null){
+				mListView.setAdapter(adapter);
+			}
 			break;
 		case R.id.action_debug:
 			mIntent = new Intent(this, DebugActivity.class);
@@ -238,6 +217,7 @@ public class MainActivity extends FragmentActivity {
 
 		return super.onMenuItemSelected(featureId, item);
 	}
+
 	
 	boolean isServiceRunning(String className) {
 	    ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
@@ -249,5 +229,39 @@ public class MainActivity extends FragmentActivity {
 	        }
 	    }
 	    return false;
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
+		// TODO 自動生成されたメソッド・スタブ
+		TextView tView = (TextView)view.findViewById(R.id.textKey);
+		ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
+		Intent mIntent;
+		if(isDebug) Log.w(CNAME,"getText=" + tView.getText());
+		if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
+			mIntent = new Intent(view.getContext(),ChartActivity.class);
+			mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+			mIntent.putExtra("KEY",tView.getText());
+			startActivity(mIntent);
+		} else {
+			mIntent = new Intent(view.getContext(),DetailActivity.class);
+			mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+			mIntent.putExtra("KEY",tView.getText());
+			startActivity(mIntent);
+		}
+	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view,int position, long id) {
+		// TODO 自動生成されたメソッド・スタブ
+		PackageManager pManager = getPackageManager();
+		TextView tView = (TextView)view.findViewById(R.id.textSysName);
+		Intent intent = pManager.getLaunchIntentForPackage((tView.getText()).toString());
+		try{
+			startActivity(intent);
+		} catch (Exception ex) {
+			Toast.makeText(view.getContext(), getString(R.string.strDontExec), Toast.LENGTH_SHORT).show();
+		}
+		return false;
 	}
 }

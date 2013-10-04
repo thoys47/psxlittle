@@ -11,9 +11,10 @@ import android.util.Log;
 public class DataObject {
 
 	public final static String DatabaseName = "psxlittle.db";
-	public final static int DatabaseVersion = 1;
+	public final static int DatabaseVersion = 2;
 	public final static String INFOTABLE = "INFOTABLE";
 	public final static String PREVINFO = "PREVINFO";
+	public final static String BATTINFO = "BATTINFO";
 	public final static String TEMPCPU = "TEMPCPU";
 	public final static String TEMPMEM = "TEMPMEM";
 	public final static String DETAILCPU = "DETAILCPU";
@@ -30,6 +31,10 @@ public class DataObject {
 	final static String[] infoType = {"INTEGER PRIMARY KEY AUTOINCREMENT","TEXT","TEXT","TEXT","TEXT","INTEGER","INTEGER","INTEGER","REAL",
 										"INTEGER","INTEGER","REAL","TEXT"};
 	final static String[] prevType = {"INTEGER PRIMARY KEY AUTOINCREMENT","TEXT","TEXT","INTEGER","INTEGER","INTEGER"};
+	
+	final static String [] battColumn = {"ID","LEBEL","STATUS","PLUGGED","TEMP","NAME","DATETIME"};
+	final static String [] battType = {"INTEGER PRIMARY KEY AUTOINCREMENT","INTEGER","TEXT","TEXT","INTEGER","TEXT","TEXT"};
+	
 	final static String[] tempColumn = {"ID","KEY","SUM","MAX","AVG"};
 	final static String[] tempType = {"INTEGER PRIMARY KEY AUTOINCREMENT","TEXT","REAL","REAL","REAL"};
 
@@ -58,6 +63,11 @@ public class DataObject {
 				for(int i = 0;i < prevColumn.length;i++){
 					sql += prevColumn[i] + " " + infoType[i] + ",";
 				}
+			} else if(tablename.equals(BATTINFO)){
+				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
+				for(int i = 0;i < battColumn.length;i++){
+					sql += battColumn[i] + " " + battType[i] + ",";
+				}
 			}
 			sql = sql.substring(0, sql.length() - 1);
 			sql += ")";
@@ -71,6 +81,11 @@ public class DataObject {
 				sql = "INSERT INTO " + tablename + " (";
 				for(int i = 0;i < prevColumn.length;i++){
 					sql += prevColumn[i] + ","; 
+				}
+			} else if(tablename.equals(BATTINFO)){
+				sql = "INSERT INTO " + tablename + " (";
+				for(int i = 0;i < battColumn.length;i++){
+					sql += battColumn[i] + ","; 
 				}
 			}
 			sql = sql.substring(0, sql.length() - 1);

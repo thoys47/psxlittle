@@ -38,6 +38,7 @@ public class ViewFragment extends Fragment {
 		
 		layouts[0] = R.layout.cpuinfo;
 		layouts[1] = R.layout.meminfo;
+		layouts[2] = R.layout.batt_main;
 		ids[0] = R.id.listCPU;
 		ids[1] = R.id.listMEM;
 	}

@@ -51,6 +51,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
 			return "CPU info";
 		case 1:
 			return "Memory Info";
+		case 2:
+			return "Battery Info";
 		}
 		return null;
 	}

@@ -27,19 +27,19 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		// TODO 自動生成されたメソッド・スタブ
 		if(isDebug) Log.w(CNAME,"enter helper");
 		try{
-			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.INFOTABLE));
-			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.PREVINFO));
-			mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.BATTINFO));
-			mdb.execSQL(DataObject.maketempSQL("CREATE",DataObject.TEMPCPU));
-			mdb.execSQL(DataObject.maketempSQL("CREATE",DataObject.TEMPMEM));
-			mdb.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILCPU));
-			mdb.execSQL(DataObject.makedetailSQL("CREATE",DataObject.DETAILMEM));
-			mdb.execSQL("CREATE INDEX INFO_IDX01 ON " + DataObject.INFOTABLE + "(DATETIME)");
-			mdb.execSQL("CREATE INDEX INFO_IDX02 ON " + DataObject.INFOTABLE + "(KEY)");
-			mdb.execSQL("CREATE INDEX PREV_IDX02 ON " + DataObject.PREVINFO + "(PID)");
-			mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + DataObject.PREVINFO + "(NAME)");
-			mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + DataObject.BATTINFO + "(DATETIME)");
-			mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + DataObject.BATTINFO + "(NAME)");
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.INFOTABLE));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.PREVINFO));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.BATTINFO));
+			mdb.execSQL(DataObject.maketempSQL("CREATE",PSXValue.TEMPCPU));
+			mdb.execSQL(DataObject.maketempSQL("CREATE",PSXValue.TEMPMEM));
+			mdb.execSQL(DataObject.makedetailSQL("CREATE",PSXValue.DETAILCPU));
+			mdb.execSQL(DataObject.makedetailSQL("CREATE",PSXValue.DETAILMEM));
+			mdb.execSQL("CREATE INDEX INFO_IDX01 ON " + PSXValue.INFOTABLE + "(DATETIME)");
+			mdb.execSQL("CREATE INDEX INFO_IDX02 ON " + PSXValue.INFOTABLE + "(KEY)");
+			mdb.execSQL("CREATE INDEX PREV_IDX02 ON " + PSXValue.PREVINFO + "(PID)");
+			mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + PSXValue.PREVINFO + "(NAME)");
+			mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + PSXValue.BATTINFO + "(DATETIME)");
+			mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + PSXValue.BATTINFO + "(NAME)");
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -55,10 +55,10 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		// TODO 自動生成されたメソッド・スタブ
 		try{
 			if(oldVersion == 1){
-				mdb.execSQL(DataObject.makeBaseSQL("CREATE",DataObject.BATTINFO));
-				mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + DataObject.PREVINFO + "(NAME)");
-				mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + DataObject.BATTINFO + "(DATETIME)");
-				mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + DataObject.BATTINFO + "(NAME)");
+				mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.BATTINFO));
+				mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + PSXValue.PREVINFO + "(NAME)");
+				mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + PSXValue.BATTINFO + "(DATETIME)");
+				mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + PSXValue.BATTINFO + "(NAME)");
 				mdb.execSQL("DROP INDEX INFO_IDX03");
 				mdb.execSQL("DROP INDEX INFO_IDX04");
 				mdb.execSQL("DROP INDEX INFO_IDX05");

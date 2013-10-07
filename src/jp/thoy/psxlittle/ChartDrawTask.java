@@ -95,7 +95,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND)); 
 			String fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 
-			String sql = "select datetime,ttime/rtime,tsize/rsize from " + DataObject.INFOTABLE
+			String sql = "select datetime,ttime/rtime,tsize/rsize from " + PSXValue.INFOTABLE
 					+ " where key = '" + params[0].key + "' and datetime >= '" + fString + "'"
 					+ " order by datetime";
 			if(isDebug){

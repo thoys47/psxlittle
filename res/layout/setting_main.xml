@@ -114,7 +114,7 @@
             style="@style/listMidium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checked="true"
+            android:checked="false"
             android:text="@string/strInfo" />
 
         <RadioButton
@@ -122,6 +122,45 @@
             style="@style/listMidium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/strPrev" />
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/lblExport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/radioCount"
+        android:text="@string/strExport"
+        android:layout_marginLeft="@dimen/margin_h"
+        android:layout_marginTop="@dimen/margin_v"
+        android:textAppearance="@style/listMidium" />
+    
+    <RadioGroup
+        android:id="@+id/radioExport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/lblExport"
+        android:layout_marginRight="@dimen/margin_h"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/radioExInfo"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/strInfo" />
+
+        <RadioButton
+            android:id="@+id/radioExPrev"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
             android:text="@string/strPrev" />
 
     </RadioGroup>

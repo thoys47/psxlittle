@@ -23,18 +23,18 @@ public class SummarizeData {
 		
 		if(key == null){
 			if(pos == 0){
-				calTable = DataObject.TEMPCPU;
+				calTable = PSXValue.TEMPCPU;
 				sumColumn = "ttime";
 			} else {
-				calTable = DataObject.TEMPMEM;
+				calTable = PSXValue.TEMPMEM;
 				sumColumn = "tsize";
 			}
 		} else {
 			if(pos == 0){
-				calTable = DataObject.DETAILCPU;
+				calTable = PSXValue.DETAILCPU;
 				sumColumn = "ttime";
 			} else {
-				calTable = DataObject.DETAILMEM;
+				calTable = PSXValue.DETAILMEM;
 				sumColumn = "tsize";
 			}
 		}
@@ -42,7 +42,7 @@ public class SummarizeData {
 		
 		DataObject mData = new DataObject(mContext);
 		SQLiteDatabase mdb = mData.dbOpen();
-		String sql = "Select count(id) from " + DataObject.INFOTABLE;
+		String sql = "Select count(id) from " + PSXValue.INFOTABLE;
 		if(key != null){
 			sql += " where key = '" + key + "'";
 		}
@@ -55,7 +55,7 @@ public class SummarizeData {
 			Log.w(CNAME,"cnt="+cursor.getString(0));
 		}
 		try{
-			sql = "Select Sum(" + sumColumn +") from " + DataObject.INFOTABLE;
+			sql = "Select Sum(" + sumColumn +") from " + PSXValue.INFOTABLE;
 			if(key != null){
 				sql += " where key = '" + key + "'";
 			}
@@ -66,9 +66,9 @@ public class SummarizeData {
 			Long total = Long.parseLong(cursor.getString(0)); 
 			//é¿ç€ÇÃåvéZ
 			if(key == null){
-				sql = "Select key,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + DataObject.INFOTABLE + " group by key";
+				sql = "Select key,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + PSXValue.INFOTABLE + " group by key";
 			} else {
-				sql = "Select name,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + DataObject.INFOTABLE + " where key = '" + key +"' group by name";
+				sql = "Select name,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + PSXValue.INFOTABLE + " where key = '" + key +"' group by name";
 			}
 			cursor = mData.dbQuery(mdb, sql);
 			mdb.execSQL("delete from " + calTable);

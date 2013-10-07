@@ -17,29 +17,29 @@ public class PSXShared {
 	}
 	
 	public SharedPreferences getSharedPrefs(){
-		return mContext.getSharedPreferences(PSXService.PREFILENAME,Activity.MODE_PRIVATE);
+		return mContext.getSharedPreferences(PSXValue.PREFILENAME,Activity.MODE_PRIVATE);
 	}
 	
 	public int getInterval(){
 		SharedPreferences preference = getSharedPrefs();
-		return preference.getInt(PSXService.INTERVAL,PSXService.DEFINTER);
+		return preference.getInt(PSXValue.INTERVAL,PSXValue.DEFINTER);
 	}
 	
 	public int getLength(){
 		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getInt(PSXService.LENGTH,PSXService.DEFLEN);
+		return preferences.getInt(PSXValue.LENGTH,PSXValue.DEFLEN);
 	}
 	
 	public Long getBefore(){
 		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getLong(PSXService.BEFORE,PSXService.DEFBEF);
+		return preferences.getLong(PSXValue.BEFORE,PSXValue.DEFBEF);
 	}
 	
 	public void putBefore(Calendar calendar){
 		SharedPreferences preferences = getSharedPrefs();
 		
 		Editor editor = preferences.edit();
-		editor.putLong(PSXService.BEFORE, calendar.getTimeInMillis());
+		editor.putLong(PSXValue.BEFORE, calendar.getTimeInMillis());
 		editor.commit();
 	}
 
@@ -47,7 +47,7 @@ public class PSXShared {
 		SharedPreferences preferences = getSharedPrefs();
 		
 		Editor editor = preferences.edit();
-		editor.putInt(PSXService.INTERVAL, interval);
+		editor.putInt(PSXValue.INTERVAL, interval);
 		editor.commit();
 	}
 
@@ -55,7 +55,7 @@ public class PSXShared {
 		SharedPreferences preferences = getSharedPrefs();
 		
 		Editor editor = preferences.edit();
-		editor.putInt(PSXService.LENGTH, length);
+		editor.putInt(PSXValue.LENGTH, length);
 		editor.commit();
 	}
 

@@ -1,5 +1,9 @@
 package jp.thoy.psxlittle;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -9,16 +13,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class DataObject {
-
-	public final static String DatabaseName = "psxlittle.db";
-	public final static int DatabaseVersion = 2;
-	public final static String INFOTABLE = "INFOTABLE";
-	public final static String PREVINFO = "PREVINFO";
-	public final static String BATTINFO = "BATTINFO";
-	public final static String TEMPCPU = "TEMPCPU";
-	public final static String TEMPMEM = "TEMPMEM";
-	public final static String DETAILCPU = "DETAILCPU";
-	public final static String DETAILMEM = "DETAILMEM";
 
 	String mSql;
 	Context mContext;
@@ -53,17 +47,17 @@ public class DataObject {
 	public static String makeBaseSQL(String option,String tablename) {
 		String sql = null;
 		if(option.equals("CREATE")){
-			if(tablename.equals(INFOTABLE)){
+			if(tablename.equals(PSXValue.INFOTABLE)){
 				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
 				for(int i = 0;i < infoColumn.length;i++){
 					sql += infoColumn[i] + " " + infoType[i] + ",";
 				}
-			} else if(tablename.equals(PREVINFO)){
+			} else if(tablename.equals(PSXValue.PREVINFO)){
 				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
 				for(int i = 0;i < prevColumn.length;i++){
 					sql += prevColumn[i] + " " + infoType[i] + ",";
 				}
-			} else if(tablename.equals(BATTINFO)){
+			} else if(tablename.equals(PSXValue.BATTINFO)){
 				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
 				for(int i = 0;i < battColumn.length;i++){
 					sql += battColumn[i] + " " + battType[i] + ",";
@@ -72,17 +66,17 @@ public class DataObject {
 			sql = sql.substring(0, sql.length() - 1);
 			sql += ")";
 		} else if (option.equals("INSERT")){
-			if(tablename.equals(INFOTABLE)){
+			if(tablename.equals(PSXValue.INFOTABLE)){
 				sql = "INSERT INTO " + tablename + " (";
 				for(int i = 0;i < infoColumn.length;i++){
 					sql += infoColumn[i] + ","; 
 				}
-			} else if(tablename.equals(PREVINFO)){
+			} else if(tablename.equals(PSXValue.PREVINFO)){
 				sql = "INSERT INTO " + tablename + " (";
 				for(int i = 0;i < prevColumn.length;i++){
 					sql += prevColumn[i] + ","; 
 				}
-			} else if(tablename.equals(BATTINFO)){
+			} else if(tablename.equals(PSXValue.BATTINFO)){
 				sql = "INSERT INTO " + tablename + " (";
 				for(int i = 0;i < battColumn.length;i++){
 					sql += battColumn[i] + ","; 
@@ -90,6 +84,23 @@ public class DataObject {
 			}
 			sql = sql.substring(0, sql.length() - 1);
 			sql += ") values (";
+		} else if(option.equals("SELECT")){
+			if(tablename.equals(PSXValue.INFOTABLE)){
+				sql = "SELECT ";
+				for(int i = 0;i < infoColumn.length;i++){
+					sql += infoColumn[i] + ","; 
+				}
+				sql = sql.substring(0, sql.length() - 1);
+				sql += " from " + tablename;
+			} else if(tablename.equals(PSXValue.PREVINFO)){
+				sql = "SELECT ";
+				for(int i = 0;i < prevColumn.length;i++){
+					sql += prevColumn[i] + ","; 
+				}
+				sql = sql.substring(0, sql.length() - 1);
+				sql += " from " + tablename;
+			}
+			
 		}
 		return sql;
 	}	
@@ -156,7 +167,7 @@ public class DataObject {
 	public SQLiteDatabase dbOpen(){
 		try{
 			SQLiteDatabase mdb = null;
-			DBOpenHelper mHelper = new DBOpenHelper(mContext,DatabaseName,null,DatabaseVersion);
+			DBOpenHelper mHelper = new DBOpenHelper(mContext,PSXValue.DatabaseName,null,PSXValue.DatabaseVersion);
 			mdb = mHelper.getWritableDatabase();
 			return mdb;
 		} catch (Exception ex) {
@@ -195,7 +206,7 @@ public class DataObject {
 		String sql = "";
 		try{
 			for(int i = 0;i < list.size();i++){
-				if(tablename.equals(INFOTABLE)){
+				if(tablename.equals(PSXValue.INFOTABLE)){
 					sql = makeBaseSQL("INSERT",tablename);
 					sql += "null,";
 					sql += "'" + list.get(i).pid + "',";
@@ -210,7 +221,7 @@ public class DataObject {
 					sql += String.valueOf(list.get(i).tsize) + ",";
 					sql += String.valueOf(list.get(i).rsize) + ",";
 					sql += "'" + list.get(i).datetime + "')";
-				} else if(tablename.equals(PREVINFO)){
+				} else if(tablename.equals(PSXValue.PREVINFO)){
 					sql = makeBaseSQL("INSERT",tablename);
 					sql += "null,";
 					sql += "'" + list.get(i).pid + "',";
@@ -239,11 +250,67 @@ public class DataObject {
 		int ret = 0;
 		Cursor cursor = null;
 		
-		mdb = dbOpen();
-		cursor = dbQuery(mdb,"select count(id) from " + name);
-		ret = cursor.getInt(0);
-		dbClose(mdb);
+		try {
+			mdb = dbOpen();
+			cursor = dbQuery(mdb,"select count(id) from " + name);
+			ret = cursor.getInt(0);
+			dbClose(mdb);
+		} catch (Exception ex) {
+			TraceLog saveTrace = new TraceLog(mContext);
+			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
+			saveTrace.saveLog(ex,CNAME + mname);
+			Log.e(CNAME,ex.getMessage());
+			ex.printStackTrace();
+		}
 		return ret;
 	}
 
+	public int exportData(String name){
+		SQLiteDatabase mdb = null;
+		int ret = 0;
+
+		File file = null;
+		file = new File(mContext.getExternalFilesDir(null), PSXValue.EXPORTFILE);
+		
+		try {
+
+			String sql = makeBaseSQL("SELECT",name);
+			mdb = this.dbOpen();
+			Cursor cursor = this.dbQuery(mdb, sql);
+			this.dbClose(mdb);
+			if(cursor.getCount() != 0){
+				file.createNewFile();
+		        if (file != null && file.exists()) {
+		        	FileWriter fw = new FileWriter(file, false);
+		        	PrintWriter pw = new PrintWriter(fw,true);
+		    		while(cursor.getPosition() < cursor.getCount()){
+			        	int num = 0;
+			        	if(name.equals(PSXValue.INFOTABLE)) {
+			        		num = infoColumn.length;
+			        	} else if (name.equals(PSXValue.PREVINFO)){
+			        		num = prevColumn.length;
+			        	}
+			        	String line = "";
+			        	for(int j = 0;j < num;j++){
+			        		line += cursor.getString(j);
+			        		if(j != num - 1) {
+			        			line += ",";
+			        		}
+			        	}
+			        	pw.println(line);
+			        	ret++;
+			        	cursor.moveToNext();
+		    		}
+		        	pw.close();
+		        } 
+			}
+		} catch (Exception ex) {
+			TraceLog saveTrace = new TraceLog(mContext);
+			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
+			saveTrace.saveLog(ex,CNAME + mname);
+			Log.e(CNAME,ex.getMessage());
+			ex.printStackTrace();
+		}
+		return ret;
+	}
 }

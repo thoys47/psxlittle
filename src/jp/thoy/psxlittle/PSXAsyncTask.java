@@ -113,28 +113,28 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		try{
 			dObject = new DataObject(mContext);
 			Cursor cursor;
-			if(execFrom.equals(PSXService.BOOT)) {
+			if(execFrom.equals(PSXValue.BOOT)) {
 				//BootReceiver
 				if(isDebug) {
 					Log.w(CNAME,"Start Boot");
 				}
 				db = dObject.dbOpen();
 				db.beginTransaction();
-				dObject.doSQL(db,"delete from " + DataObject.PREVINFO);
-				dObject.insertInfo(db,finalList, DataObject.PREVINFO);
+				dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
+				dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				dObject.dbClose(db);
 				if(isDebug){
 					Log.w(CNAME,"End Boot");
 				}
-			} else if(execFrom.equals(PSXService.INSTALL)) {
+			} else if(execFrom.equals(PSXValue.INSTALL)) {
 				if(isDebug) {
 					Log.w(CNAME,"Start Install");
 				}
 				db = dObject.dbOpen();
 				db.beginTransaction();
-				dObject.insertInfo(db,finalList, DataObject.PREVINFO);
+				dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				dObject.dbClose(db);
@@ -143,14 +143,14 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				}
 			} else {
 				db = dObject.dbOpen();
-				cursor = dObject.dbQuery(db, "select count(id) from " + DataObject.PREVINFO);
+				cursor = dObject.dbQuery(db, "select count(id) from " + PSXValue.PREVINFO);
 				if(cursor.getString(0).equals("0")){
 					if(isDebug)	{
 						Log.w(CNAME,"prev deleted");
 					}
 					db = dObject.dbOpen();
 					db.beginTransaction();
-					dObject.insertInfo(db,finalList, DataObject.PREVINFO);
+					dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
 					db.setTransactionSuccessful();
 					db.endTransaction();
 					dObject.dbClose(db);
@@ -159,8 +159,9 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					}
 				} else {
 					
-					cursor = dObject.dbQuery(db, "select sum(ttime) from " + DataObject.PREVINFO);
+					cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
 					dObject.dbClose(db);
+
 					prevTime = Long.parseLong(cursor.getString(0));
 					
 					if(isDebug){
@@ -173,8 +174,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						}
 						db = dObject.dbOpen();
 						db.beginTransaction();
-						dObject.doSQL(db,"delete from " + DataObject.PREVINFO);
-						dObject.insertInfo(db,finalList, DataObject.PREVINFO);
+						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
+						dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
 						db.setTransactionSuccessful();
 						db.endTransaction();
 						dObject.dbClose(db);
@@ -183,15 +184,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						}
 					} else {
 						totalTime = totalTime - prevTime;
-						for(int i = 0; i < finalList.size();i++){
-							InfoTable dList = new InfoTable();
-							dList.pid = finalList.get(i).pid;
-							dList.name = finalList.get(i).name;
-							dList.utime = finalList.get(i).utime;
-							dList.stime = finalList.get(i).stime;
-							dList.ttime = finalList.get(i).ttime;
-							prevList.add(dList);
-						}
 						if(isDebug){
 							Log.w(CNAME,"info size=" + finalList.size() + " prev size=" + prevList.size());
 						}
@@ -199,7 +191,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							Log.w(CNAME,"Start Second");
 						}
 						for(int i = 0;i < finalList.size();i++){
-							String sql = "select utime,stime from " + DataObject.PREVINFO;
+							String sql = "select utime,stime from " + PSXValue.PREVINFO;
 							sql += " where pid = '" + finalList.get(i).pid + "' and name = '" + finalList.get(i).name + "'";
 							db = dObject.dbOpen();
 							cursor = dObject.dbQuery(db, sql);
@@ -229,17 +221,27 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						if(isDebug){
 							Log.w(CNAME,"before insert");
 						}
+						for(int i = 0; i < finalList.size();i++){
+							InfoTable dList = new InfoTable();
+							dList.pid = finalList.get(i).pid;
+							dList.name = finalList.get(i).name;
+							dList.utime = finalList.get(i).utime;
+							dList.stime = finalList.get(i).stime;
+							dList.ttime = finalList.get(i).ttime;
+							prevList.add(dList);
+						}
+
 						db = dObject.dbOpen();
 						db.beginTransaction();
-						dObject.insertInfo(db,finalList, DataObject.INFOTABLE);
-						dObject.doSQL(db,"delete from " + DataObject.PREVINFO);
+						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
+						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
 						
 						PSXShared pShared = new PSXShared(mContext);
 						int length = pShared.getLength();
 						calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-						dObject.doSQL(db,"delete from " + DataObject.INFOTABLE
+						dObject.doSQL(db,"delete from " + PSXValue.INFOTABLE
 								+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'");
-						dObject.insertInfo(db,prevList, DataObject.PREVINFO);
+						dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
 						db.setTransactionSuccessful();
 						db.endTransaction();
 	

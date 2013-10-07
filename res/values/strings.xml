@@ -27,5 +27,6 @@
 	<string name="strCount">Toast Count</string>
     <string name="strInfo">InfoTable</string>
     <string name="strPrev">PrevTable</string>
+    <string name="strExport">Export Data</string>
     
 </resources>

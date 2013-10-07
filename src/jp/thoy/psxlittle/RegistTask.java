@@ -24,7 +24,7 @@ public class RegistTask {
 		// TODO 自動生成されたメソッド・スタブ
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(mContext));
 		Intent rIntent = new Intent(mContext,PSXService.class);
-		rIntent.setAction(PSXService.REPEAT);
+		rIntent.setAction(PSXValue.REPEAT);
 		
 		AlarmManager mAlarmManager = (AlarmManager)mContext.getSystemService(Activity.ALARM_SERVICE);
 		PendingIntent pIntent = PendingIntent.getService(mContext, 0, rIntent, PendingIntent.FLAG_UPDATE_CURRENT);

@@ -46,7 +46,7 @@ public class GetBatteryInfo {
 				bInfo.plugged = PLUGGED_WIRELESS;
 				break;
 			default :
-				bInfo.plugged = PLUGGED_AC;
+				bInfo.plugged = PLUGGED_NONE;
 		}
 		bInfo.temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 		return bInfo;

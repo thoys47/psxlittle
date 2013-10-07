@@ -99,14 +99,14 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		long before = pShared.getBefore();
 		if(before == 0L){
 			if(isDebug){
-				Log.w(CNAME,"install from main count" + mDO.countTable(DataObject.PREVINFO));
+				Log.w(CNAME,"install from main count" + mDO.countTable(PSXValue.PREVINFO));
 			}
 			PSXAsyncTask aTask = new PSXAsyncTask();
 			Param  mParam = new Param();
 			ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
 			mParam.cParam = context;
 			mParam.aParam = mActivityManager;
-			mParam.sParam = PSXService.INSTALL;
+			mParam.sParam = PSXValue.INSTALL;
 			mParam.clParam = CNAME;
 			aTask.execute(mParam);
 

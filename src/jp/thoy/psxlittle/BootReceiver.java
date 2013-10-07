@@ -30,7 +30,7 @@ public class BootReceiver extends BroadcastReceiver {
 			ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
 			param.cParam = context;
 			param.aParam = mActivityManager;
-			param.sParam = PSXService.BOOT;
+			param.sParam = PSXValue.BOOT;
 			param.clParam = CNAME;
 			aTask.execute(param);
 			PSXShared pShared = new PSXShared(context);
@@ -56,7 +56,7 @@ public class BootReceiver extends BroadcastReceiver {
 		BatteryInfo bInfo = batteryInfo.getInfo(intent);
 		DataObject dObject = new DataObject(context);
 		SQLiteDatabase mdb = dObject.dbOpen();
-		String sql = DataObject.makeBaseSQL("INSERT", DataObject.BATTINFO);
+		String sql = DataObject.makeBaseSQL("INSERT", PSXValue.BATTINFO);
 		sql += "null,";
 		sql += String.valueOf(bInfo.rLevel) + ",";
 		sql += "'" + bInfo.status + "',";

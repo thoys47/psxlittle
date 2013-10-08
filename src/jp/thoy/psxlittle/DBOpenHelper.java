@@ -30,13 +30,12 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.INFOTABLE));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.PREVINFO));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.BATTINFO));
-			mdb.execSQL(DataObject.maketempSQL("CREATE",PSXValue.TEMPCPU));
-			mdb.execSQL(DataObject.maketempSQL("CREATE",PSXValue.TEMPMEM));
-			mdb.execSQL(DataObject.makedetailSQL("CREATE",PSXValue.DETAILCPU));
-			mdb.execSQL(DataObject.makedetailSQL("CREATE",PSXValue.DETAILMEM));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPCPU));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPMEM));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.DETAILCPU));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.DETAILMEM));
 			mdb.execSQL("CREATE INDEX INFO_IDX01 ON " + PSXValue.INFOTABLE + "(DATETIME)");
 			mdb.execSQL("CREATE INDEX INFO_IDX02 ON " + PSXValue.INFOTABLE + "(KEY)");
-			mdb.execSQL("CREATE INDEX PREV_IDX02 ON " + PSXValue.PREVINFO + "(PID)");
 			mdb.execSQL("CREATE INDEX PREV_IDX03 ON " + PSXValue.PREVINFO + "(NAME)");
 			mdb.execSQL("CREATE INDEX BATT_IDX01 ON " + PSXValue.BATTINFO + "(DATETIME)");
 			mdb.execSQL("CREATE INDEX BATT_IDX02 ON " + PSXValue.BATTINFO + "(NAME)");

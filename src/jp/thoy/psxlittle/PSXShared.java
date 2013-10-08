@@ -34,6 +34,10 @@ public class PSXShared {
 		SharedPreferences preferences = getSharedPrefs();
 		return preferences.getLong(PSXValue.BEFORE,PSXValue.DEFBEF);
 	}
+	public Long getPrevTime(){
+		SharedPreferences preferences = getSharedPrefs();
+		return preferences.getLong(PSXValue.PREVTIME,PSXValue.DEFPREV);
+	}
 	
 	public void putBefore(Calendar calendar){
 		SharedPreferences preferences = getSharedPrefs();
@@ -59,4 +63,11 @@ public class PSXShared {
 		editor.commit();
 	}
 
+	public void putPrevTime(Long time){
+		SharedPreferences preferences = getSharedPrefs();
+		
+		Editor editor = preferences.edit();
+		editor.putLong(PSXValue.PREVTIME, time);
+		editor.commit();
+	}
 }

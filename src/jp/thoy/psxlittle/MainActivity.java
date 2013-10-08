@@ -190,6 +190,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				tPlugged.setText(bInfo.plugged + " ");
 				TextView tCharge = (TextView)findViewById(R.id.txtCharge);
 				tCharge.setText(bInfo.status + " ");
+				
 			default :
 				mListView = null;
 				adapter = null;

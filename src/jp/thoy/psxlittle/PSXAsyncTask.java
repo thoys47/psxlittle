@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = false;
+	private final static boolean isDebug = true;
 	Context mContext;
 	
 	
@@ -42,11 +42,15 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		}
 		
 		Result result = new Result();
-		Long totalTime = Long.valueOf(0);
-		Long totalSize = Long.valueOf(0);
-		Long prevTime = Long.valueOf(0);
+		Long totalTime = 0L;
+		Long totalSize = 0L;
+		Long prevTime = 0L;
 		//Long ntotalTime = Long.valueOf(0);
 
+		if(isDebug){
+			Log.e(CNAME,"Start 1");
+		}
+		
 		try {
 			String command = "ps -x";
 			Runtime runtime = Runtime.getRuntime();
@@ -62,29 +66,29 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					if(!temp1[4].equals("0") && !temp1[9].equals("(u:0") && !temp1[10].equals("s:0)")) {
 						InfoTable dList = new InfoTable();
 						initList(dList);
-						dList.uid = temp1[0];
-						dList.pid = temp1[1];
 						dList.name = temp1[8];
-						if(dList.uid.equals("system")) {
+						if(temp1[0].equals("system")) {
 							dList.key = "system";
-						} else if(dList.uid.equals("root")){
+						} else if(temp1[0].equals("root")){
 							dList.key = "root";
-						} else if(dList.uid.equals("shell")){
+						} else if(temp1[0].equals("shell")){
 							dList.key = "root";
 						} else {
 							dList.key = dList.name;
 						}
-						dList.rss = Integer.parseInt(temp1[4]);
+						//dList.rss = Integer.parseInt(temp1[4]);
 						dList.tsize = Integer.parseInt(temp1[4]);
+						PSXShared pShared = new PSXShared(mContext);
+						int interval = pShared.getInterval();
+						calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
 						dList.datetime = CommTools.CalendarToString(calendar,CommTools.DATETIMELONG);
 						temp2 = temp1[9].split(":");
 						String ut = String.valueOf(temp2[1]);
-						dList.utime = Integer.parseInt(ut.substring(0, ut.length() - 1));
 						temp2 = temp1[10].split(":");
 						String st = String.valueOf(temp2[1]);
-						dList.stime = Integer.parseInt(st.substring(0, st.length() - 1));
 	
-						dList.ttime = dList.utime + dList.stime;
+						dList.ttime = Integer.parseInt(ut.substring(0, ut.length() - 1))
+								+ Integer.parseInt(st.substring(0, st.length() - 1));
 						
 						totalTime += dList.ttime;
 						totalSize += dList.tsize;
@@ -95,6 +99,24 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			}
 			reader.close();
 			process.waitFor();
+			
+			command = "cat /proc/stat";
+			process = runtime.exec(command);
+			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String[] temp3 = new String[11];
+			while ((line = reader.readLine()) != null) {
+				temp3 = line.split("[\\s]+");
+				if(temp3[1].equals("cpu")){
+					totalTime = Long.parseLong(temp3[1]) + Long.parseLong(temp3[2]) + Long.parseLong(temp3[3]) + Long.parseLong(temp3[4]);
+					break;
+				}
+			}
+			reader.close();
+			process.waitFor();
+			PSXShared pShared = new PSXShared(mContext);
+			prevTime = pShared.getPrevTime();
+			pShared.putPrevTime(totalTime);
+			
 		} catch (Exception ex) {
 			saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -106,51 +128,51 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		}
 
 		if(isDebug){
-			Log.w(CNAME,"Check point 1");
+			Log.e(CNAME,"Start 2");
 		}
+		
 		DataObject dObject;
 		SQLiteDatabase db = null;
 		try{
 			dObject = new DataObject(mContext);
 			Cursor cursor;
-			if(execFrom.equals(PSXValue.BOOT)) {
+			for(int i = 0; i < finalList.size();i++){
+				InfoTable dList = new InfoTable();
+				dList.name = finalList.get(i).name;
+				dList.ttime = finalList.get(i).ttime;
+				prevList.add(dList);
+			}
+			if(isDebug){
+				Log.w(CNAME,"list cnt=" + prevList.size());
+			}
+
+			if(execFrom.equals(PSXValue.BOOT) || execFrom.equals(PSXValue.INSTALL)) {
 				//BootReceiver
 				if(isDebug) {
-					Log.w(CNAME,"Start Boot");
+					Log.w(CNAME,"Start " + execFrom);
 				}
 				db = dObject.dbOpen();
 				db.beginTransaction();
 				dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
-				dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
+				dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				dObject.dbClose(db);
 				if(isDebug){
-					Log.w(CNAME,"End Boot");
-				}
-			} else if(execFrom.equals(PSXValue.INSTALL)) {
-				if(isDebug) {
-					Log.w(CNAME,"Start Install");
-				}
-				db = dObject.dbOpen();
-				db.beginTransaction();
-				dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
-				db.setTransactionSuccessful();
-				db.endTransaction();
-				dObject.dbClose(db);
-				if(isDebug)	{
-					Log.w(CNAME,"End Install");
+					Log.w(CNAME,"End " + execFrom);
 				}
 			} else {
 				db = dObject.dbOpen();
 				cursor = dObject.dbQuery(db, "select count(id) from " + PSXValue.PREVINFO);
+				dObject.dbClose(db);
+				
 				if(cursor.getString(0).equals("0")){
 					if(isDebug)	{
 						Log.w(CNAME,"prev deleted");
 					}
 					db = dObject.dbOpen();
 					db.beginTransaction();
-					dObject.insertInfo(db,finalList, PSXValue.PREVINFO);
+					dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
 					db.setTransactionSuccessful();
 					db.endTransaction();
 					dObject.dbClose(db);
@@ -158,20 +180,20 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						Log.w(CNAME,"End prev deleted");
 					}
 				} else {
-					
-					cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
-					dObject.dbClose(db);
-
-					prevTime = Long.parseLong(cursor.getString(0));
-					
+					if(prevTime == 0L){
+						db = dObject.dbOpen();
+						cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
+						dObject.dbClose(db);
+						prevTime = Long.parseLong(cursor.getString(0));
+					}
 					if(isDebug){
 						Log.w(CNAME,"prev = " + prevTime + " total = " + totalTime);
 					}
-					
 					if(totalTime <= prevTime){
 						if(isDebug){
 							Log.w(CNAME,"Counter is back");
 						}
+
 						db = dObject.dbOpen();
 						db.beginTransaction();
 						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
@@ -185,28 +207,30 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					} else {
 						totalTime = totalTime - prevTime;
 						if(isDebug){
-							Log.w(CNAME,"info size=" + finalList.size() + " prev size=" + prevList.size());
-						}
-						if(isDebug){
 							Log.w(CNAME,"Start Second");
 						}
+						Long nTotalTime = 0L;
+						if(isDebug){
+							Log.e(CNAME,"Start 3");
+						}
 						for(int i = 0;i < finalList.size();i++){
-							String sql = "select utime,stime from " + PSXValue.PREVINFO;
-							sql += " where pid = '" + finalList.get(i).pid + "' and name = '" + finalList.get(i).name + "'";
+							String sql = "select ttime from " + PSXValue.PREVINFO;
+							//sql += " where pid = '" + finalList.get(i).pid + "' and name = '" + finalList.get(i).name + "'";
+							sql += " where name = '" + finalList.get(i).name + "'";
 							db = dObject.dbOpen();
 							cursor = dObject.dbQuery(db, sql);
 							dObject.dbClose(db);
 							if(cursor.getCount() != 0) {
-								if(finalList.get(i).utime >= Integer.parseInt(cursor.getString(0))){
-									finalList.get(i).utime = finalList.get(i).utime - Integer.parseInt(cursor.getString(0));
-								}
-								if(finalList.get(i).stime >= Integer.parseInt(cursor.getString(1))){
-									finalList.get(i).stime = finalList.get(i).stime - Integer.parseInt(cursor.getString(1));
+								//Log.w(CNAME,"1 name=" + finalList.get(i).name + " u=" + finalList.get(i).utime + " s=" + finalList.get(i).stime);
+								if(finalList.get(i).ttime >= Integer.parseInt(cursor.getString(0))){
+									finalList.get(i).ttime = finalList.get(i).ttime - Integer.parseInt(cursor.getString(0));
 								}
 							} else if(cursor.getCount() > 1) {
 								Log.e(CNAME,"Too many Items in previnfo");
 							}
-							finalList.get(i).ttime = finalList.get(i).utime + finalList.get(i).stime;
+							//Log.w(CNAME,"2 name=" + finalList.get(i).name + " u=" + finalList.get(i).utime + " s=" + finalList.get(i).stime);
+							//finalList.get(i).ttime = finalList.get(i).utime + finalList.get(i).stime;
+							//nTotalTime +=finalList.get(i).ttime;  
 							finalList.get(i).rtime = (double)totalTime;
 							finalList.get(i).rsize = (double)totalSize;
 							//double ttmp = (double)(finalList.get(i).ttime * 100) / (double)totalTime;
@@ -216,19 +240,18 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							//if(finalList.get(i).rsize > 100){
 							//	Log.e(CNAME,"name=" + finalList.get(i).name + " totalSize" + totalSize + " rsime=" + finalList.get(i).rsize);
 							//}
-							//ntotalTime += finalList.get(i).ttime;
+							nTotalTime += finalList.get(i).ttime;
 						}
 						if(isDebug){
-							Log.w(CNAME,"before insert");
+							Log.e(CNAME,"Start 4");
 						}
-						for(int i = 0; i < finalList.size();i++){
-							InfoTable dList = new InfoTable();
-							dList.pid = finalList.get(i).pid;
-							dList.name = finalList.get(i).name;
-							dList.utime = finalList.get(i).utime;
-							dList.stime = finalList.get(i).stime;
-							dList.ttime = finalList.get(i).ttime;
-							prevList.add(dList);
+						if(nTotalTime > totalTime){
+							for(int i = 0;i < finalList.size();i++){
+								finalList.get(i).rtime = (double)nTotalTime;
+							}
+						}						
+						if(isDebug){
+							Log.e(CNAME,"Start 5");
 						}
 
 						db = dObject.dbOpen();
@@ -246,9 +269,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.endTransaction();
 	
 						if(isDebug){
-							Log.w(CNAME,"after insert");
+							Log.e(CNAME,"Start 6");
 						}
-	
 						dObject.dbClose(db);
 						if(isDebug){
 							Log.w(CNAME,"End Second");
@@ -274,16 +296,11 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	}
 
 	private void initList(InfoTable dList){
-		dList.uid = "";
-		dList.pid = "";
 		dList.name = "";
 		dList.key = "";
 		dList.datetime = "";
-		dList.utime = 0;
-		dList.stime = 0;
 		dList.ttime = 0;
 		dList.rtime = 0.0;
-		dList.rss = 0;
 		dList.tsize = 0;
 		dList.rsize = 0.0;
 	}

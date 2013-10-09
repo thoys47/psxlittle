@@ -9,14 +9,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.BatteryManager;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
-	public final static String NAME_BATT = "Battery";
 	static String CNAME;
-	final static boolean isDebug = false;
-
+	final static boolean isDebug = PSXValue.isDebug;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -51,7 +48,10 @@ public class BootReceiver extends BroadcastReceiver {
 	private void storeBatteryInfo(Context context,Intent intent){
 		
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		calendar.add(Calendar.MINUTE, (-1) * (calendar.get(Calendar.MINUTE) % 5));
+		calendar.add(Calendar.SECOND, (-1) * (calendar.get(Calendar.SECOND)));
 		String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+		
 		GetBatteryInfo batteryInfo = new GetBatteryInfo();
 		BatteryInfo bInfo = batteryInfo.getInfo(intent);
 		DataObject dObject = new DataObject(context);
@@ -61,10 +61,19 @@ public class BootReceiver extends BroadcastReceiver {
 		sql += String.valueOf(bInfo.rLevel) + ",";
 		sql += "'" + bInfo.status + "',";
 		sql += "'" + bInfo.plugged + "',";
-		sql += String.valueOf(bInfo.temp) + ',';
-		sql += "'" + NAME_BATT + "',";
+		sql += String.valueOf((bInfo.temp + 5)/ 10) + ',';
+		sql += "'" + PSXValue.NAME_BATT + "',";
 		sql += "'" + datetime + "')";
 		dObject.doSQL(mdb, sql);
+		PSXShared pShared = new PSXShared(context);
+		int length = pShared.getLength();
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		sql = "delete from " + PSXValue.BATTINFO
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(mdb,sql);
+		if(isDebug){
+			Log.w(CNAME,sql);
+		}
 		dObject.dbClose(mdb);
 	}
 	

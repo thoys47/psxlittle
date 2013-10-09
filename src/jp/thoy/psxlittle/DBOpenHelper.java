@@ -10,7 +10,7 @@ import android.util.Log;
 public class DBOpenHelper extends SQLiteOpenHelper {
 
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
+	final static boolean isDebug = PSXValue.isDebug;
 	Context mContext;
 
 	public DBOpenHelper(Context context, String name, CursorFactory factory,
@@ -28,6 +28,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		if(isDebug) Log.w(CNAME,"enter helper");
 		try{
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.INFOTABLE));
+			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPINFO));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.PREVINFO));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.BATTINFO));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPCPU));
@@ -62,6 +63,9 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 				mdb.execSQL("DROP INDEX INFO_IDX04");
 				mdb.execSQL("DROP INDEX INFO_IDX05");
 				mdb.execSQL("DROP INDEX INFO_IDX06");
+			}
+			if(oldVersion == 2){
+				mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPINFO));
 			}
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);

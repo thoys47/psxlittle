@@ -20,10 +20,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ListAdapter extends ArrayAdapter<TempTable> {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
-	private LayoutInflater mInflater;
-	private PackageManager mPackageManager;
+
+	LayoutInflater mInflater;
+	PackageManager mPackageManager;
 	
 	public ListAdapter(Context context, ArrayList<TempTable> objects,PackageManager pm) {
 		super(context, 0, objects);

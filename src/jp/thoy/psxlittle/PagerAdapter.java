@@ -1,5 +1,6 @@
 package jp.thoy.psxlittle;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,11 +9,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 public class PagerAdapter extends FragmentPagerAdapter {
 
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
-	
 	String mLimit;
-	public PackageManager mPackageManager;
+	PackageManager mPackageManager;
+	Context mContext;
 	
 	public PagerAdapter(FragmentManager fm) {
 		super(fm);
@@ -23,36 +22,42 @@ public class PagerAdapter extends FragmentPagerAdapter {
 	public void setPackageManager(PackageManager pm){
 		mPackageManager = pm;
 	}
+
+	public void setContext(Context context){
+		mContext = context;
+	}
+	
 	@Override
 	public Fragment getItem(int position) {
 		// getItem is called to instantiate the fragment for the given page.
 		// Return a DummySectionFragment (defined as a static inner class
 		// below) with the page number as its lone argument.
 		//Log.d(TAG,"getItem");
-		ViewFragment mFragment = new ViewFragment();
-		mFragment.setPackageManager(mPackageManager);
+		ViewFragment fragment = new ViewFragment();
+		fragment.setPackageManager(mPackageManager);
+		fragment.setContext(mContext);
 		Bundle args = new Bundle();
-		args.putInt(MainActivity.K_PAGE, position);
-		mFragment.setArguments(args);
+		args.putInt(PSXValue.K_PAGE, position);
+		fragment.setArguments(args);
 
-		return mFragment;
+		return fragment;
 	}
 
 	@Override
 	public int getCount() {
 		// Show 3 total pages.
-		return MainActivity.TAB_NUM;
+		return PSXValue.TAB_NUM;
 	}
 
 	@Override
 	public CharSequence getPageTitle(int position) {
 		switch (position) {
-		case 0:
-			return "CPU info";
-		case 1:
-			return "Memory Info";
-		case 2:
-			return "Battery Info";
+		case PSXValue.P_CPU:
+			return mContext.getResources().getString(R.string.ttlCPU);
+		case PSXValue.P_MEM:
+			return mContext.getResources().getString(R.string.ttlMEM);
+		case PSXValue.P_BATT:
+			return mContext.getResources().getString(R.string.ttlBATT);
 		}
 		return null;
 	}

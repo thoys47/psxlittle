@@ -27,6 +27,10 @@
 	<string name="strCount">Toast Count</string>
     <string name="strInfo">InfoTable</string>
     <string name="strPrev">PrevTable</string>
+    <string name="strBatt">BattTable</string>
     <string name="strExport">Export Data</string>
+    <string name="ttlCPU">CPU info</string>
+    <string name="ttlMEM">Memory info</string>
+    <string name="ttlBATT">Battery info</string>
     
 </resources>

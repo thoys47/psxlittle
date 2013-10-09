@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = true;
+	private final static boolean isDebug = false;
 	Context mContext;
 	
 	
@@ -22,7 +22,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	protected void onPostExecute(Result result) {
 		// TODO 自動生成されたメソッド・スタブ
 		super.onPostExecute(result);
-		
 	}
 
 	@Override
@@ -31,6 +30,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(mContext));
 
 		ArrayList<InfoTable> prevList = new ArrayList<InfoTable>();
+		ArrayList<InfoTable> tempList = new ArrayList<InfoTable>();
 		ArrayList<InfoTable> finalList = new ArrayList<InfoTable>();
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		String execFrom = param[0].sParam;
@@ -65,7 +65,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					//if(!temp1[4].equals("0") && !temp1[9].equals("(u:0") && !temp1[10].equals("s:0)")) {
 					if(!temp1[4].equals("0") && !temp1[9].equals("(u:0") && !temp1[10].equals("s:0)")) {
 						InfoTable dList = new InfoTable();
-						initList(dList);
 						dList.name = temp1[8];
 						if(temp1[0].equals("system")) {
 							dList.key = "system";
@@ -76,12 +75,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						} else {
 							dList.key = dList.name;
 						}
-						//dList.rss = Integer.parseInt(temp1[4]);
 						dList.tsize = Integer.parseInt(temp1[4]);
-						PSXShared pShared = new PSXShared(mContext);
-						int interval = pShared.getInterval();
-						calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
-						dList.datetime = CommTools.CalendarToString(calendar,CommTools.DATETIMELONG);
 						temp2 = temp1[9].split(":");
 						String ut = String.valueOf(temp2[1]);
 						temp2 = temp1[10].split(":");
@@ -89,11 +83,12 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	
 						dList.ttime = Integer.parseInt(ut.substring(0, ut.length() - 1))
 								+ Integer.parseInt(st.substring(0, st.length() - 1));
+						dList.datetime = "";
 						
 						totalTime += dList.ttime;
 						totalSize += dList.tsize;
 						
-						finalList.add(dList);
+						tempList.add(dList);
 					}
 				}
 			}
@@ -136,6 +131,34 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		try{
 			dObject = new DataObject(mContext);
 			Cursor cursor;
+			
+			db = dObject.dbOpen();
+			db.beginTransaction();
+			dObject.doSQL(db, "delete from " + PSXValue.TEMPINFO);
+			dObject.insertInfo(db, tempList, PSXValue.TEMPINFO);
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			
+			String sql = "select name,key,sum(ttime),sum(tsize) from "
+							+ PSXValue.TEMPINFO + " group by name";
+			cursor = dObject.dbQuery(db, sql);
+			
+			dObject.dbClose(db);
+			PSXShared pShared = new PSXShared(mContext);
+			int interval = pShared.getInterval();
+			calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
+			String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+			for(int i = 0;i < cursor.getCount();i++){
+				InfoTable fList = new InfoTable();
+				fList.name = cursor.getString(0);
+				fList.key = cursor.getString(0);
+				fList.ttime = cursor.getInt(2);
+				fList.tsize = cursor.getInt(3);
+				fList.datetime = datetime;
+				finalList.add(fList);
+				cursor.moveToNext();
+			}
+			
 			for(int i = 0; i < finalList.size();i++){
 				InfoTable dList = new InfoTable();
 				dList.name = finalList.get(i).name;
@@ -214,7 +237,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							Log.e(CNAME,"Start 3");
 						}
 						for(int i = 0;i < finalList.size();i++){
-							String sql = "select ttime from " + PSXValue.PREVINFO;
+							sql = "select ttime from " + PSXValue.PREVINFO;
 							//sql += " where pid = '" + finalList.get(i).pid + "' and name = '" + finalList.get(i).name + "'";
 							sql += " where name = '" + finalList.get(i).name + "'";
 							db = dObject.dbOpen();
@@ -259,7 +282,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
 						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
 						
-						PSXShared pShared = new PSXShared(mContext);
+						pShared = new PSXShared(mContext);
 						int length = pShared.getLength();
 						calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
 						dObject.doSQL(db,"delete from " + PSXValue.INFOTABLE
@@ -293,16 +316,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		}
 		result.bResult = true;
 		return result;
-	}
-
-	private void initList(InfoTable dList){
-		dList.name = "";
-		dList.key = "";
-		dList.datetime = "";
-		dList.ttime = 0;
-		dList.rtime = 0.0;
-		dList.tsize = 0;
-		dList.rsize = 0.0;
 	}
 	
 }

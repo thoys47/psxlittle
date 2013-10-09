@@ -125,6 +125,14 @@
             android:checked="false"
             android:text="@string/strPrev" />
 
+        <RadioButton
+            android:id="@+id/radioBarr"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/strBatt" />
+        
     </RadioGroup>
 
     <TextView
@@ -162,7 +170,15 @@
             android:layout_height="wrap_content"
             android:checked="false"
             android:text="@string/strPrev" />
-
+        
+        <RadioButton
+            android:id="@+id/radioExBatt"
+            style="@style/listMidium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/strBatt" />
+        
     </RadioGroup>
     
     

@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 public class DetailActivity extends Activity {
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
+	final static boolean isDebug = PSXValue.isDebug;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

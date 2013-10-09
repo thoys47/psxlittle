@@ -6,13 +6,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 public class RegistTask {
 	
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
+	final static boolean isDebug = PSXValue.isDebug;
 	
 	Context mContext;
 

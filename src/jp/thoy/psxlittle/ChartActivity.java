@@ -6,11 +6,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 public class ChartActivity extends Activity {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
+
     Context mContext;
 	
 	@Override
@@ -21,15 +19,15 @@ public class ChartActivity extends Activity {
 		mContext = getApplicationContext();
 		
 		Intent intent = getIntent();
-		String key = intent.getStringExtra(MainActivity.K_KEY);
-		String page = intent.getStringExtra(MainActivity.K_PAGE);
-		if(isDebug) Log.w(CNAME,"key=" + key);
+		String key = intent.getStringExtra(PSXValue.K_KEY);
+		String page = intent.getStringExtra(PSXValue.K_PAGE);
 		ChartDrawTask chartTask = new ChartDrawTask(mContext,this);
 		Param param = new Param();
 		param.cParam = getApplicationContext();
 		param.acParam = this;
 		param.key = key;
 		param.page = page;
+		param.chartId = R.id.chart_area;
 		chartTask.execute(param);
 
 	}

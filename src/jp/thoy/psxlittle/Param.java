@@ -12,4 +12,5 @@ public class Param {
 	String page;
 	String sParam;
 	String clParam;
+	int chartId;
 }

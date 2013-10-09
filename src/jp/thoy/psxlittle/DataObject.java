@@ -2,7 +2,6 @@ package jp.thoy.psxlittle;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,10 +13,9 @@ import android.util.Log;
 
 public class DataObject {
 
-	String mSql;
 	Context mContext;
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = false;
+	final static boolean isDebug = PSXValue.isDebug;
 	
 	
 	final Calendar calendar = Calendar.getInstance();
@@ -36,10 +34,15 @@ public class DataObject {
 				for(int i = 0;i < PSXValue.infoColumn.length;i++){
 					sql += PSXValue.infoColumn[i] + " " + PSXValue.infoType[i] + ",";
 				}
+			} else if(tablename.equals(PSXValue.TEMPINFO)){
+				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
+				for(int i = 0;i < PSXValue.infoColumn.length;i++){
+					sql += PSXValue.infoColumn[i] + " " + PSXValue.infoType[i] + ",";
+				}
 			} else if(tablename.equals(PSXValue.PREVINFO)){
 				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
 				for(int i = 0;i < PSXValue.prevColumn.length;i++){
-					sql += PSXValue.prevColumn[i] + " " + PSXValue.infoType[i] + ",";
+					sql += PSXValue.prevColumn[i] + " " + PSXValue.prevType[i] + ",";
 				}
 			} else if(tablename.equals(PSXValue.BATTINFO)){
 				sql = "CREATE TABLE IF NOT EXISTS " + tablename + " (";
@@ -61,6 +64,11 @@ public class DataObject {
 			sql += ")";
 		} else if (option.equals("INSERT")){
 			if(tablename.equals(PSXValue.INFOTABLE)){
+				sql = "INSERT INTO " + tablename + " (";
+				for(int i = 0;i < PSXValue.infoColumn.length;i++){
+					sql += PSXValue.infoColumn[i] + ","; 
+				}
+			} else if(tablename.equals(PSXValue.TEMPINFO)){
 				sql = "INSERT INTO " + tablename + " (";
 				for(int i = 0;i < PSXValue.infoColumn.length;i++){
 					sql += PSXValue.infoColumn[i] + ","; 
@@ -103,8 +111,14 @@ public class DataObject {
 				}
 				sql = sql.substring(0, sql.length() - 1);
 				sql += " from " + tablename;
+			} else if(tablename.equals(PSXValue.BATTINFO)){
+				sql = "SELECT ";
+				for(int i = 0;i < PSXValue.battColumn.length;i++){
+					sql += PSXValue.battColumn[i] + ","; 
+				}
+				sql = sql.substring(0, sql.length() - 1);
+				sql += " from " + tablename;
 			}
-			
 		}
 		return sql;
 	}	
@@ -170,7 +184,7 @@ public class DataObject {
 		String sql = "";
 		try{
 			for(int i = 0;i < list.size();i++){
-				if(tablename.equals(PSXValue.INFOTABLE)){
+				if(tablename.equals(PSXValue.INFOTABLE) || tablename.equals(PSXValue.TEMPINFO)){
 					sql = makeBaseSQL("INSERT",tablename);
 					sql += "null,";
 					sql += "'" + list.get(i).name + "',";
@@ -254,6 +268,13 @@ public class DataObject {
 		    			for(int j = 0;j < num;j++){
 		        			line += "\"";
 			        		line += PSXValue.prevColumn[j];
+			        		line += "\",";
+			        	}
+		        	} else if (name.equals(PSXValue.BATTINFO)){
+		        		num = PSXValue.battColumn.length;
+		    			for(int j = 0;j < num;j++){
+		        			line += "\"";
+			        		line += PSXValue.battColumn[j];
 			        		line += "\",";
 			        	}
 		        	}

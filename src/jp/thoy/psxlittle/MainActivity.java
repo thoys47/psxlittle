@@ -29,11 +29,8 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
 
-	public static final int TAB_NUM = 3;
-	public final static String K_PAGE = "PAGE";
-	public final static String K_KEY = "KEY";
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = false;
+	private final static boolean isDebug = PSXValue.isDebug;
 	
 	final static Calendar calendar = Calendar.getInstance();
 	final static int year = calendar.get(Calendar.YEAR);
@@ -50,12 +47,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	PagerAdapter mPagerAdapter;
-	
-	/**
-	 * The {@link ViewPager} that will host the section contents.
-	 */
-	ViewPager mViewPager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,17 +56,20 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(context));
 		
-		PackageManager mPackageManager = getPackageManager();
-        
 		try{
 			
+			PackageManager packageManager = getPackageManager();
+			PagerAdapter pagerAdapter;
+			ViewPager viewPager;
+
 			DataObject mDataObject = new DataObject(context);
 			SQLiteDatabase mdb = mDataObject.dbOpen();
 			mDataObject.dbClose(mdb);
-			mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
-			mPagerAdapter.setPackageManager(mPackageManager);
-			mViewPager = (ViewPager)findViewById(R.id.viewPager);
-			mViewPager.setAdapter(mPagerAdapter);
+			pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+			pagerAdapter.setPackageManager(packageManager);
+			pagerAdapter.setContext(context);
+			viewPager = (ViewPager)findViewById(R.id.viewPager);
+			viewPager.setAdapter(pagerAdapter);
 			
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(context);
@@ -152,65 +146,73 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		Intent mIntent;
 		Context context = getApplicationContext();
 		ArrayList<TempTable> list;
-		ListAdapter adapter;
-		ListView mListView;
+		ListAdapter adapter = null;
+		ListView mListView = null;
 		int ids[] = new int[]{R.id.listCPU,R.id.listMEM};
 		
 		switch(item.getItemId()){
-		case R.id.action_reload:
-			ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
-			PackageManager pManager = getPackageManager();
-			switch(vPager.getCurrentItem()){
-			case 0:
-			case 1:
-				SummarizeData iCalc = new SummarizeData(context);
-				list = iCalc.calculate(null,vPager.getCurrentItem());
-				if(list == null){
-					Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
-					return super.onMenuItemSelected(featureId, item);
+			case R.id.action_reload:
+				ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
+				PackageManager pManager = getPackageManager();
+				switch(vPager.getCurrentItem()){
+					case PSXValue.P_CPU:
+					case PSXValue.P_MEM:
+						SummarizeData iCalc = new SummarizeData(context);
+						list = iCalc.calculate(null,vPager.getCurrentItem());
+						if(list == null){
+							Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
+							return super.onMenuItemSelected(featureId, item);
+						}
+						mListView = (ListView)findViewById(ids[vPager.getCurrentItem()]);
+						adapter = new ListAdapter(this,list,pManager);
+						list = iCalc.calculate(null,vPager.getCurrentItem());
+						if(list == null){
+							return super.onMenuItemSelected(featureId, item);
+						}
+						break;
+					case PSXValue.P_BATT:
+						IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+						Intent intent = context.registerReceiver(null, ifilter);
+						GetBatteryInfo batteryInfo = new GetBatteryInfo();
+						BatteryInfo bInfo = batteryInfo.getInfo(intent);
+						
+						TextView tLebel = (TextView)findViewById(R.id.txtBattery);
+						tLebel.setText(String.valueOf(bInfo.rLevel) + " %");
+						TextView tTemp = (TextView)findViewById(R.id.txtTemp);
+						tTemp.setText(String.valueOf(bInfo.temp) + " ");
+						TextView tPlugged = (TextView)findViewById(R.id.txtPlugged);
+						tPlugged.setText(bInfo.plugged + " ");
+						TextView tCharge = (TextView)findViewById(R.id.txtCharge);
+						tCharge.setText(bInfo.status + " ");
+						ChartDrawTask chartTask = new ChartDrawTask(context,this);
+						Param param = new Param();
+						param.cParam = getApplicationContext();
+						param.acParam = this;
+						param.key = PSXValue.NAME_BATT;
+						param.page = String.valueOf(vPager.getCurrentItem());
+						param.chartId = R.id.battery_area;
+						chartTask.execute(param);
+						break;
+					default :
+						mListView = null;
+						adapter = null;
 				}
-				mListView = (ListView)findViewById(ids[vPager.getCurrentItem()]);
-				adapter = new ListAdapter(this,list,pManager);
-				list = iCalc.calculate(null,vPager.getCurrentItem());
-				if(list == null){
-					return super.onMenuItemSelected(featureId, item);
+				if(adapter != null && mListView != null){
+					mListView.setAdapter(adapter);
+					mListView.setOnItemClickListener(this);
+					mListView.setOnItemLongClickListener(this);
 				}
 				break;
-			case 2:
-				IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-				Intent intent = context.registerReceiver(null, ifilter);
-				GetBatteryInfo batteryInfo = new GetBatteryInfo();
-				BatteryInfo bInfo = batteryInfo.getInfo(intent);
-				
-				TextView tLebel = (TextView)findViewById(R.id.txtBattery);
-				tLebel.setText(String.valueOf(bInfo.rLevel) + " %");
-				TextView tTemp = (TextView)findViewById(R.id.txtTemp);
-				tTemp.setText(String.valueOf((double)bInfo.temp / (double)10.0) + " ");
-				TextView tPlugged = (TextView)findViewById(R.id.txtPlugged);
-				tPlugged.setText(bInfo.plugged + " ");
-				TextView tCharge = (TextView)findViewById(R.id.txtCharge);
-				tCharge.setText(bInfo.status + " ");
-				
-			default :
-				mListView = null;
-				adapter = null;
-			}
-			if(adapter != null && mListView != null){
-				mListView.setAdapter(adapter);
-				mListView.setOnItemClickListener(this);
-				mListView.setOnItemLongClickListener(this);
-			}
-			break;
-		case R.id.action_debug:
-			mIntent = new Intent(this, DebugActivity.class);
-	    	startActivity(mIntent);
-			break;
-		case R.id.action_setting:
-			mIntent = new Intent(this, SettingActivity.class);
-	    	startActivity(mIntent);
-			break;
-		default:
-				;
+			case R.id.action_debug:
+				mIntent = new Intent(this, DebugActivity.class);
+		    	startActivity(mIntent);
+				break;
+			case R.id.action_setting:
+				mIntent = new Intent(this, SettingActivity.class);
+		    	startActivity(mIntent);
+				break;
+			default:
+					;
 		}
 
 		return super.onMenuItemSelected(featureId, item);

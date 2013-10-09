@@ -125,6 +125,9 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 					case R.id.radioExPrev:
 						name = PSXValue.PREVINFO;
 						break;
+					case R.id.radioExBatt:
+						name = PSXValue.BATTINFO;
+						break;
 					default:
 						name = PSXValue.INFOTABLE;
 				}

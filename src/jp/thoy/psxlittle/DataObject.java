@@ -247,7 +247,6 @@ public class DataObject {
 			String sql = makeBaseSQL("SELECT",name);
 			mdb = this.dbOpen();
 			Cursor cursor = this.dbQuery(mdb, sql);
-			this.dbClose(mdb);
 			if(cursor.getCount() != 0){
 				file.createNewFile();
 		        if (file != null && file.exists()) {
@@ -296,6 +295,7 @@ public class DataObject {
 		        	pw.close();
 		        } 
 			}
+			this.dbClose(mdb);
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();

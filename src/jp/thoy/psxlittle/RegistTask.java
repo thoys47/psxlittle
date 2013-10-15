@@ -34,7 +34,7 @@ public class RegistTask {
 		Calendar calendar = Calendar.getInstance();
 
 		calendar.add(Calendar.MINUTE, interval - (calendar.get(Calendar.MINUTE) % interval));
-		calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND) + 30);
+		calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
 		
 		if(isDebug){
 			Log.w(CNAME,CommTools.CalendarToString(calendar, CommTools.TIMELONG));
@@ -42,9 +42,10 @@ public class RegistTask {
 			//saveLog.saveDebug("next:" + CommTools.CalendarToString(calendar, CommTools.TIMELONG));
 		}
 		
-		//mAlarmManager.cancel(pIntent);
+		mAlarmManager.cancel(pIntent);
 		mAlarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval * 1000 * 60, pIntent);
 		//mAlarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pIntent);
+		//Log.e(CNAME,"next:" + CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));
 	}
 
 

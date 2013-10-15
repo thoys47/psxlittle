@@ -20,96 +20,105 @@ public class SummarizeData {
 		ArrayList<TempTable> calList = new ArrayList<TempTable>();
 		String calTable = "";
 		String sumColumn = "";
-		
+		String divColumn = "";
+ 		
 		if(key == null){
-			if(pos == 0){
+			if(pos == PSXValue.P_CPU){
 				calTable = PSXValue.TEMPCPU;
 				sumColumn = "ttime";
+				divColumn = "rtime";
 			} else {
 				calTable = PSXValue.TEMPMEM;
 				sumColumn = "tsize";
+				divColumn = "rsize";
 			}
 		} else {
-			if(pos == 0){
+			if(pos == PSXValue.P_CPU){
 				calTable = PSXValue.DETAILCPU;
 				sumColumn = "ttime";
+				divColumn = "rtime";
 			} else {
 				calTable = PSXValue.DETAILMEM;
 				sumColumn = "tsize";
+				divColumn = "rsize";
 			}
 		}
 		
-		
-		DataObject mData = new DataObject(mContext);
-		SQLiteDatabase mdb = mData.dbOpen();
-		String sql = "Select count(id) from " + PSXValue.INFOTABLE;
-		if(key != null){
-			sql += " where key = '" + key + "'";
-		}
-		Cursor cursor = mData.dbQuery(mdb, sql);
-		if(cursor.getString(0).equals("0") || cursor == null){
-			mData.dbClose(mdb);
-			return null;
-		}
-		if(isDebug){
-			Log.w(CNAME,"cnt="+cursor.getString(0));
-		}
+		DataObject dObject = new DataObject(mContext);
+		SQLiteDatabase db = null;
 		try{
-			sql = "Select Sum(" + sumColumn +") from " + PSXValue.INFOTABLE;
+			db = dObject.dbOpen();
+			String sql = "Select sum(" + sumColumn + ") from " + PSXValue.INFOTABLE;
 			if(key != null){
 				sql += " where key = '" + key + "'";
 			}
-			cursor = mData.dbQuery(mdb, sql);
+			Cursor cursor = dObject.dbQuery(db, sql);
+			if(cursor.getString(0).equals("0") || cursor == null){
+				dObject.dbClose(db);
+				return null;
+			}
+			if(isDebug){
+				Log.w(CNAME,"cnt="+cursor.getString(0));
+			}
+			long total = cursor.getLong(0);
+			if(key == null){
+				sql = "Select key,sum(" + sumColumn + ")"
+						+ ",max(" + sumColumn + "/" + divColumn + ")"
+						+ ",avg(" + sumColumn + "/" + divColumn + ")" 
+						+ " from " + PSXValue.INFOTABLE + " group by key";
+			} else {
+				sql = "Select name,sum(" + sumColumn + ")"
+						+ ",max(" + sumColumn + "/" + divColumn + ")"
+						+ ",avg(" + sumColumn + "/" + divColumn + ")" 
+						+ " from " + PSXValue.INFOTABLE
+						+ " where key = '" + key +"' group by name";
+			}
+			if(isDebug){
+				Log.w(CNAME,sql);
+			}
+			cursor = dObject.dbQuery(db, sql);
 			if(cursor == null){
 				return null;
 			}
-			Long total = Long.parseLong(cursor.getString(0)); 
-			//é¿ç€ÇÃåvéZ
-			if(key == null){
-				sql = "Select key,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + PSXValue.INFOTABLE + " group by key";
-			} else {
-				sql = "Select name,sum(" + sumColumn + "),max(" + sumColumn + "),avg(" + sumColumn + ") from " + PSXValue.INFOTABLE + " where key = '" + key +"' group by name";
-			}
-			cursor = mData.dbQuery(mdb, sql);
-			mdb.execSQL("delete from " + calTable);
-			mdb.beginTransaction();
-			for(int i = 0;i < cursor.getCount();i++){
-				double stmp = (double)(Long.parseLong(cursor.getString(1)) * 100) / (double)total;
-				stmp = (double)((int)((stmp * 100) + 0.5)) / 100;
-				double atmp = (double)(Double.parseDouble(cursor.getString(3)));
-				atmp = (double)((int)((atmp * 100) + 0.5)) / 100;
-	
+			sql = "delete from " + calTable;
+			dObject.doSQL(db, sql);
+			db.beginTransaction();
+			while(cursor.getPosition() < cursor.getCount()){
 				sql = "insert into " + calTable + " (ID,KEY,SUM,MAX,AVG) values (";
 				sql += "null,'" + cursor.getString(0) + "',";
-				sql += String.format("%.2f", stmp) + ",";
-				sql += cursor.getString(2) + ",";
-				sql += String.format("%.2f", atmp) + ")";
-				mdb.execSQL(sql);
+				double tmp = (double)cursor.getLong(1) * 100.0 /(double)total;
+				tmp = (double)((int)((tmp * 100.0) + 0.5) / 100.0);
+				sql += String.format("%.2f",tmp) + ",";
+				tmp = ((double)cursor.getDouble(2)) * 100.0;
+				tmp = (double)((int)((tmp * 100.0) + 0.5) / 100.0);
+				sql += String.format("%.2f",tmp) + ",";
+				sql += cursor.getString(3) + ")";
+				db.execSQL(sql);
 				cursor.moveToNext();
 			}
-			mdb.setTransactionSuccessful();
-			mdb.endTransaction();
-			sql = "Select key,sum,max,avg from " + calTable + " order by sum desc";
-			cursor = mData.dbQuery(mdb, sql);
-			for(int i = 0;i < cursor.getCount();i++){
+			db.setTransactionSuccessful();
+			db.endTransaction();
+			sql = "Select key,sum,max,avg from " + calTable + " where sum > 0 order by sum desc";
+			
+			cursor = dObject.dbQuery(db, sql);
+			dObject.dbClose(db);
+			while(cursor.getPosition() < cursor.getCount()){
 				TempTable list = new TempTable();
 				list.key = cursor.getString(0);
 				
 				list.AppName = cursor.getString(0);
 				list.SysName = cursor.getString(0);
 				
-				list.sum = cursor.getString(1);
-				list.max = cursor.getString(2);
-				list.avg = cursor.getString(3);
+				list.sum = cursor.getDouble(1);
+				list.max = cursor.getDouble(2);
+				list.avg = cursor.getDouble(3);
 				calList.add(list);
 				cursor.moveToNext();
 			}
 			
-			mData.dbClose(mdb);
 		} catch (Exception ex){
-			if(mdb != null){
-				mdb.endTransaction();
-				mdb.close();
+			if(db != null){
+				db.close();
 			}
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();

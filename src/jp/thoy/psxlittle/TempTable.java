@@ -5,7 +5,7 @@ public class TempTable {
 	String SysName;
 	String key;
 	String DateTime;
-	String max;
-	String avg;
-	String sum;
+	double max;
+	double avg;
+	double sum;
 }

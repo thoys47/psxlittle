@@ -30,20 +30,27 @@ public class PSXShared {
 		return preferences.getInt(PSXValue.LENGTH,PSXValue.DEFLEN);
 	}
 	
-	public Long getBefore(){
+	public Long getLastExec(){
+		// If NOT exist return 0L.
 		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getLong(PSXValue.BEFORE,PSXValue.DEFBEF);
+		return preferences.getLong(PSXValue.LAST_EXECUTE,PSXValue.DEFLAST);
 	}
 	public Long getPrevTime(){
 		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getLong(PSXValue.PREVTIME,PSXValue.DEFPREV);
+		return preferences.getLong(PSXValue.PREV_CPU_TIME,PSXValue.DEFPREV);
 	}
 	
-	public void putBefore(Calendar calendar){
+	public Long getLastBattery(){
+		// If NOT exist return 0L.
+		SharedPreferences preferences = getSharedPrefs();
+		return preferences.getLong(PSXValue.LAST_RCV_BATT,PSXValue.DEFLAST);
+	}
+	
+	public void putLastExec(Calendar calendar){
 		SharedPreferences preferences = getSharedPrefs();
 		
 		Editor editor = preferences.edit();
-		editor.putLong(PSXValue.BEFORE, calendar.getTimeInMillis());
+		editor.putLong(PSXValue.LAST_EXECUTE, calendar.getTimeInMillis());
 		editor.commit();
 	}
 
@@ -67,7 +74,15 @@ public class PSXShared {
 		SharedPreferences preferences = getSharedPrefs();
 		
 		Editor editor = preferences.edit();
-		editor.putLong(PSXValue.PREVTIME, time);
+		editor.putLong(PSXValue.PREV_CPU_TIME, time);
+		editor.commit();
+	}
+
+	public void putLastBattery(Calendar calendar){
+		SharedPreferences preferences = getSharedPrefs();
+		
+		Editor editor = preferences.edit();
+		editor.putLong(PSXValue.LAST_RCV_BATT, calendar.getTimeInMillis());
 		editor.commit();
 	}
 }

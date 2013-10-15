@@ -48,6 +48,7 @@ public class ListAdapter extends ArrayAdapter<TempTable> {
 			TextView mSysName = (TextView)convertView.findViewById(R.id.textSysName);
 			TextView mKey = (TextView)convertView.findViewById(R.id.textKey);
 			TextView mSum = (TextView)convertView.findViewById(R.id.textCPUUse);
+			TextView mAvg = (TextView)convertView.findViewById(R.id.textCPUAvg);
 			Resources resource = parent.getResources();
 			if(!item.key.equals("")){
 				if(!item.key.equals("system") && !item.key.equals("root")){
@@ -89,7 +90,8 @@ public class ListAdapter extends ArrayAdapter<TempTable> {
 					mSysName.setText(item.SysName);
 					mKey.setText(item.key);
 				}
-				mSum.setText(item.sum + "%");
+				mSum.setText(String.format("%.2f",item.sum) + "%");
+				mAvg.setText(String.format("%.2f",item.max) + "%");
 			} else {
 				mIcon.setImageDrawable(null);
 			}

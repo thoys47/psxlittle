@@ -90,7 +90,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		DataObject mDO = new DataObject(context);
 		PSXShared pShared = new PSXShared(context);
 		
-		long before = pShared.getBefore();
+		long before = pShared.getLastExec();
 		if(before == 0L){
 			if(isDebug){
 				Log.w(CNAME,"install from main count" + mDO.countTable(PSXValue.PREVINFO));
@@ -104,7 +104,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 			mParam.clParam = CNAME;
 			aTask.execute(mParam);
 
-			pShared.putBefore(Calendar.getInstance());
+			pShared.putLastExec(Calendar.getInstance());
 		}
 		
 		IntentFilter iFilter = new IntentFilter();
@@ -112,7 +112,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		iFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
 		iFilter.addAction(Intent.ACTION_TIME_CHANGED);
 		iFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-		iFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+		//iFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
 
 		BootReceiver mReceiver = new BootReceiver();
 		try{

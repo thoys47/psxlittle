@@ -63,9 +63,9 @@ public class ViewFragment extends Fragment {
 			cList.AppName = "";
 			cList.SysName = "";
 			cList.key = "";
-			cList.sum = "";
-			cList.max = "";
-			cList.avg = "";
+			cList.sum = 0.0;
+			cList.max = 0.0;
+			cList.avg = 0.0;
 			cList.DateTime = "";
 			infoList.add(cList);
 			ListAdapter adapter = new ListAdapter(context,infoList,mPackageManager);
@@ -76,9 +76,9 @@ public class ViewFragment extends Fragment {
 			mList.AppName = "";
 			mList.SysName = "";
 			mList.key = "";
-			mList.sum = "";
-			mList.max = "";
-			mList.avg = "";
+			mList.sum = 0.0;
+			mList.max = 0.0;
+			mList.avg = 0.0;
 			mList.DateTime = "";
 			infoList.add(mList);
 			ListAdapter adapter = new ListAdapter(context,infoList,mPackageManager);

@@ -1,13 +1,17 @@
 package jp.thoy.psxlittle;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
+import android.util.Log;
 
 public class PSXService extends Service {
 	static String CNAME;
@@ -32,7 +36,9 @@ public class PSXService extends Service {
 		aTask.execute(mParam);
 
 		PSXShared pShared = new PSXShared(context);
-		pShared.putBefore(Calendar.getInstance());
+		pShared.putLastExec(Calendar.getInstance());
+		
+		storeBatteryInfo(context);
 
 		/*
 		RegistTask rTask = new RegistTask(context);
@@ -46,5 +52,43 @@ public class PSXService extends Service {
 		// TODO 自動生成されたメソッド・スタブ
 		return null;
 	}
+	private void storeBatteryInfo(Context context){
+		
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		calendar.add(Calendar.MINUTE, (-1) * (calendar.get(Calendar.MINUTE) % 5));
+		calendar.add(Calendar.SECOND, (-1) * (calendar.get(Calendar.SECOND)));
+		String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+		
+		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		Intent intent = context.registerReceiver(null, ifilter);
+		GetBatteryInfo batteryInfo = new GetBatteryInfo();
+		BatteryInfo bInfo = batteryInfo.getInfo(intent);
+
+		DataObject dObject = new DataObject(context);
+		SQLiteDatabase mdb = dObject.dbOpen();
+		String sql = DataObject.makeBaseSQL("INSERT", PSXValue.BATTINFO);
+		sql += "null,";
+		sql += String.valueOf(bInfo.rLevel) + ",";
+		sql += "'" + bInfo.status + "',";
+		sql += "'" + bInfo.plugged + "',";
+		sql += String.valueOf(bInfo.temp) + ',';
+		sql += "'" + PSXValue.NAME_BATT + "',";
+		sql += "'" + datetime + "')";
+		dObject.doSQL(mdb, sql);
+		if(isDebug){
+			Log.w(CNAME,sql);
+		}
+		PSXShared pShared = new PSXShared(context);
+		int length = pShared.getLength();
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		sql = "delete from " + PSXValue.BATTINFO
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(mdb,sql);
+		if(isDebug){
+			Log.w(CNAME,sql);
+		}
+		dObject.dbClose(mdb);
+	}
+
 
 }

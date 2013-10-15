@@ -140,45 +140,26 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				calendar.add(Calendar.MINUTE, interval);
 				String tString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 				if(isDebug){
-					Log.w(CNAME,"data=" + cursor.getString(0) + " fString=" + fString + " tString=" + tString);
+					//Log.w(CNAME,"data=" + cursor.getString(0) + " fString=" + fString + " tString=" + tString);
 				}
 				
-				if(cursor.getString(0).compareTo(fString) >= 0 && cursor.getString(0).compareTo(tString) < 0){
-					if(isDebug){
-						Log.w(CNAME,"data=" + cursor.getString(1));
-					}
-					switch(page){
-					case PSXValue.P_CPU:
-						values[i] = Double.parseDouble(cursor.getString(1)) * 100.0;
-						break;
-					case PSXValue.P_MEM:
-						values[i] = Double.parseDouble(cursor.getString(2)) * 100.0;
-						break;
-					case PSXValue.P_BATT:
-						values[i] = Double.parseDouble(cursor.getString(1));
-					}
-					if(chartSettings.max < (int)((values[i] * 1.3) + 0.5)){
-						chartSettings.max = (int)((values[i] * 1.3) + 0.5);
-					}
-					if(cursor.getPosition() < cursor.getCount() - 1){
-						cursor.moveToNext();
-					}
-				} else {
-					//if(lost == i - 1 && cursor.getPosition() < cursor.getCount() - 1){
-					//	cursor.moveToNext();
-					//}
-					values[i] = 0.0;
-					if(page == 2 && i > 1){
+				values[i] = getValue(fString,tString,cursor,page);
+				if(page == PSXValue.P_BATT){
+					if(values[i] == 0.0 && i > 1){
 						values[i] = values[i - 1];
 					}
 				}
+				
+				//if(chartSettings.max < (int)((values[i] * 1.3) + 0.5)){
+				//	chartSettings.max = (int)((values[i] * 1.3) + 0.5);
+				//}
 			}
-			if(chartSettings.max < 1){
-				chartSettings.max = 1;
-			}
-			if(page == PSXValue.P_BATT){
+			//if(chartSettings.max < 1){
+			//	chartSettings.max = 1;
+			//}
+			//if(page == PSXValue.P_BATT){
 				chartSettings.max = 120;
-			}
+			//}
 			chartSettings.x.add(x);
 			chartSettings.values.add(values);
 		} catch (Exception ex) {
@@ -191,5 +172,33 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		result.chartSettings = chartSettings;
 		return result;
 	}
+	
+	private double getValue(String fString,String tString,Cursor cursor,int page) {
+		double ret = 0.0;
+		cursor.moveToFirst();
+		while(cursor.getPosition() < cursor.getCount()){
+			String datetime = cursor.getString(0);
+			if(datetime.compareTo(fString) >= 0 && datetime.compareTo(tString) < 0){
+				if(isDebug){
+					Log.w(CNAME,"data=" + cursor.getString(1));
+				}
+				switch(page){
+				case PSXValue.P_CPU:
+					ret = Double.parseDouble(cursor.getString(1)) * 100.0;
+					break;
+				case PSXValue.P_MEM:
+					ret = Double.parseDouble(cursor.getString(2)) * 100.0;
+					break;
+				case PSXValue.P_BATT:
+					ret = Double.parseDouble(cursor.getString(1));
+					break;
+				}
+				break;
+			}
+			cursor.moveToNext();
+		}
+		return ret;
+	}
+	
 	
 }

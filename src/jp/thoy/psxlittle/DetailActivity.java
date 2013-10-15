@@ -27,7 +27,7 @@ public class DetailActivity extends Activity {
 		
 		PackageManager pManager = getPackageManager();
 		SummarizeData iCalc = new SummarizeData(getApplicationContext());
-		ArrayList<TempTable> list;
+		ArrayList<TempTable> list = null;
 		ListAdapter adapter;
 		ListView mListView;
 		mListView = (ListView)findViewById(R.id.listDetail);
@@ -46,7 +46,7 @@ public class DetailActivity extends Activity {
 			adapter = null;
 		}
 		if(isDebug){
-			Log.w(CNAME,"cnt="+list.size());
+			Log.w(CNAME,"cnt=" + list.size());
 		}
 		mListView.setAdapter(adapter);
 

@@ -149,6 +149,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		ListAdapter adapter = null;
 		ListView mListView = null;
 		int ids[] = new int[]{R.id.listCPU,R.id.listMEM};
+		DataObject mDO = new DataObject(context);
 		
 		switch(item.getItemId()){
 			case R.id.action_reload:
@@ -157,12 +158,13 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				switch(vPager.getCurrentItem()){
 					case PSXValue.P_CPU:
 					case PSXValue.P_MEM:
-						SummarizeData iCalc = new SummarizeData(context);
-						list = iCalc.calculate(null,vPager.getCurrentItem());
-						if(list == null){
+						int cnt = mDO.countTable(PSXValue.INFOTABLE);
+						if(cnt == 0){
 							Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
 							return super.onMenuItemSelected(featureId, item);
 						}
+						SummarizeData iCalc = new SummarizeData(context);
+						list = iCalc.calculate(null,vPager.getCurrentItem());
 						mListView = (ListView)findViewById(ids[vPager.getCurrentItem()]);
 						adapter = new ListAdapter(this,list,pManager);
 						list = iCalc.calculate(null,vPager.getCurrentItem());
@@ -184,6 +186,13 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 						tPlugged.setText(bInfo.plugged + " ");
 						TextView tCharge = (TextView)findViewById(R.id.txtCharge);
 						tCharge.setText(bInfo.status + " ");
+
+						cnt = mDO.countTable(PSXValue.BATTINFO);
+						if(cnt == 0){
+							Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
+							return super.onMenuItemSelected(featureId, item);
+						}
+						
 						ChartDrawTask chartTask = new ChartDrawTask(context,this);
 						Param param = new Param();
 						param.cParam = getApplicationContext();

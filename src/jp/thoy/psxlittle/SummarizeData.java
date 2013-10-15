@@ -52,8 +52,11 @@ public class SummarizeData {
 			if(key != null){
 				sql += " where key = '" + key + "'";
 			}
+			if(isDebug){
+				Log.w(CNAME,"sql=" + sql);
+			}
 			Cursor cursor = dObject.dbQuery(db, sql);
-			if(cursor.getString(0).equals("0") || cursor == null){
+			if(cursor.getString(0) == null || cursor == null){
 				dObject.dbClose(db);
 				return null;
 			}

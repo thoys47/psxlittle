@@ -146,7 +146,9 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			PSXShared pShared = new PSXShared(mContext);
 			int interval = pShared.getInterval();
 			calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
+			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
 			String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+
 			for(int i = 0;i < cursor.getCount();i++){
 				InfoTable fList = new InfoTable();
 				fList.name = cursor.getString(0);

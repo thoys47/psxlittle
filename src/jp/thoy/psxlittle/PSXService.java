@@ -54,9 +54,12 @@ public class PSXService extends Service {
 	}
 	private void storeBatteryInfo(Context context){
 		
+		int interval;
+		PSXShared pShared = new PSXShared(context);
+		interval = pShared.getInterval();
 		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.add(Calendar.MINUTE, (-1) * (calendar.get(Calendar.MINUTE) % 5));
-		calendar.add(Calendar.SECOND, (-1) * (calendar.get(Calendar.SECOND)));
+		calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
+		calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
 		String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 		
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
@@ -65,7 +68,7 @@ public class PSXService extends Service {
 		BatteryInfo bInfo = batteryInfo.getInfo(intent);
 
 		DataObject dObject = new DataObject(context);
-		SQLiteDatabase mdb = dObject.dbOpen();
+		SQLiteDatabase db = dObject.dbOpen();
 		String sql = DataObject.makeBaseSQL("INSERT", PSXValue.BATTINFO);
 		sql += "null,";
 		sql += String.valueOf(bInfo.rLevel) + ",";
@@ -74,20 +77,11 @@ public class PSXService extends Service {
 		sql += String.valueOf(bInfo.temp) + ',';
 		sql += "'" + PSXValue.NAME_BATT + "',";
 		sql += "'" + datetime + "')";
-		dObject.doSQL(mdb, sql);
+		dObject.doSQL(db, sql);
 		if(isDebug){
 			Log.w(CNAME,sql);
 		}
-		PSXShared pShared = new PSXShared(context);
-		int length = pShared.getLength();
-		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-		sql = "delete from " + PSXValue.BATTINFO
-				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
-		dObject.doSQL(mdb,sql);
-		if(isDebug){
-			Log.w(CNAME,sql);
-		}
-		dObject.dbClose(mdb);
+		dObject.dbClose(db);
 	}
 
 

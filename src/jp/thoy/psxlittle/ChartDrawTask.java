@@ -142,7 +142,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				String tString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 				values[i] = getValue(fString,tString,cursor,page);
 				if(page == PSXValue.P_BATT){
-					if(values[i] == 0.0 && i > 1){
+					if(values[i] == MathHelper.NULL_VALUE && i > 1){
 						values[i] = values[i - 1];
 					}
 				}

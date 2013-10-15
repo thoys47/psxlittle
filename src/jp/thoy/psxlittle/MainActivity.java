@@ -134,6 +134,14 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		String sql = "delete from " + PSXValue.INFOTABLE
 				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
 		dObject.doSQL(db,sql);
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		sql = "delete from " + PSXValue.BATTINFO
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(db,sql);
+		if(isDebug){
+			Log.w(CNAME,sql);
+		}
+
 		dObject.dbClose(db);
 		if(isDebug){
 			Log.w(CNAME,"OnStart");

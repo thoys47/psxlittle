@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class SummarizeData {
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = PSXValue.isDebug;
+	final static boolean isDebug = true;
 	Context mContext;
 	
 	public SummarizeData(Context context){

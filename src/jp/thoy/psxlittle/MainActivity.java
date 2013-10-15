@@ -87,13 +87,13 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		super.onStart();
 
 		Context context = getApplicationContext();
-		DataObject mDO = new DataObject(context);
+		DataObject dObject = new DataObject(context);
 		PSXShared pShared = new PSXShared(context);
 		
 		long before = pShared.getLastExec();
 		if(before == 0L){
 			if(isDebug){
-				Log.w(CNAME,"install from main count" + mDO.countTable(PSXValue.PREVINFO));
+				Log.w(CNAME,"install from main count" + dObject.countTable(PSXValue.PREVINFO));
 			}
 			PSXAsyncTask aTask = new PSXAsyncTask();
 			Param  mParam = new Param();
@@ -127,6 +127,14 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		}
 		RegistTask rTask = new RegistTask(getApplicationContext());
 		rTask.StartCommand();
+		
+		int length = pShared.getLength();
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		SQLiteDatabase db = dObject.dbOpen();
+		String sql = "delete from " + PSXValue.INFOTABLE
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(db,sql);
+		dObject.dbClose(db);
 		if(isDebug){
 			Log.w(CNAME,"OnStart");
 		}
@@ -227,37 +235,25 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		return super.onMenuItemSelected(featureId, item);
 	}
 
-	
-	boolean isServiceRunning(String className) {
-	    ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
-	    List<ActivityManager.RunningServiceInfo> serviceInfos = am.getRunningServices(Integer.MAX_VALUE);
-	    int serviceNum = serviceInfos.size();
-	    for (int i = 0; i < serviceNum; i++) {
-	    	if (serviceInfos.get(i).service.getClassName().equals(className)) {
-	    		return true;
-	        }
-	    }
-	    return false;
-	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 		// TODO 自動生成されたメソッド・スタブ
 		TextView tView = (TextView)view.findViewById(R.id.textKey);
 		ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
-		Intent mIntent;
+		Intent intent;
 		if(isDebug) Log.w(CNAME,"getText=" + tView.getText());
-		if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
-			mIntent = new Intent(view.getContext(),ChartActivity.class);
-			mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-			mIntent.putExtra("KEY",tView.getText());
-			startActivity(mIntent);
-		} else {
-			mIntent = new Intent(view.getContext(),DetailActivity.class);
-			mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-			mIntent.putExtra("KEY",tView.getText());
-			startActivity(mIntent);
-		}
+		//if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
+			intent = new Intent(view.getContext(),ChartActivity.class);
+			intent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+			intent.putExtra("KEY",tView.getText());
+			startActivity(intent);
+		//} else {
+		//	mIntent = new Intent(view.getContext(),DetailActivity.class);
+		//	mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+		//	mIntent.putExtra("KEY",tView.getText());
+		//	startActivity(mIntent);
+		//}
 	}
 
 	@Override
@@ -266,10 +262,18 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		PackageManager pManager = getPackageManager();
 		TextView tView = (TextView)view.findViewById(R.id.textSysName);
 		Intent intent = pManager.getLaunchIntentForPackage((tView.getText()).toString());
-		try{
+		if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
+			try{
+				startActivity(intent);
+			} catch (Exception ex) {
+				Toast.makeText(view.getContext(), getString(R.string.strDontExec), Toast.LENGTH_SHORT).show();
+			}
+		} else {
+			ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
+			intent = new Intent(view.getContext(),DetailActivity.class);
+			intent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+			intent.putExtra("KEY",tView.getText());
 			startActivity(intent);
-		} catch (Exception ex) {
-			Toast.makeText(view.getContext(), getString(R.string.strDontExec), Toast.LENGTH_SHORT).show();
 		}
 		return false;
 	}

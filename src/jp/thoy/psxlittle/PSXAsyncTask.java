@@ -17,8 +17,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	private final static boolean isDebug = false;
 	Context mContext;
 	
-	
-	
 	@Override
 	protected void onPreExecute() {
 		// TODO 自動生成されたメソッド・スタブ
@@ -53,10 +51,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		Long totalSize = 0L;
 		Long prevTime = 0L;
 
-		if(isDebug){
-			Log.e(CNAME,"Start 1");
-		}
-		
 		try {
 			String command = "ps -x";
 			Runtime runtime = Runtime.getRuntime();
@@ -127,17 +121,15 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			return result;
 		}
 
-		if(isDebug){
-			Log.e(CNAME,"Start 2");
-		}
-		
 		DataObject dObject;
 		SQLiteDatabase db = null;
 		String sql;
 		try{
 			dObject = new DataObject(mContext);
 			Cursor cursor;
-			
+
+			if(isDebug) Log.w(CNAME,"Async 1st part");
+			//Same name process is merged
 			db = dObject.dbOpen();
 			db.beginTransaction();
 			sql = "delete from " + PSXValue.TEMPINFO;
@@ -147,7 +139,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			db.endTransaction();
 			
 			sql = "select name,key,sum(ttime),sum(tsize) from "
-							+ PSXValue.TEMPINFO + " group by name";
+							+ PSXValue.TEMPINFO + " group by name order by name desc";
 			cursor = dObject.dbQuery(db, sql);
 			
 			dObject.dbClose(db);
@@ -172,9 +164,11 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				dList.ttime = finalList.get(i).ttime;
 				prevList.add(dList);
 			}
-			
+
+			if(isDebug) Log.w(CNAME,"Async 2nd part");
+
 			if(execFrom.equals(PSXValue.BOOT) || execFrom.equals(PSXValue.INSTALL)) {
-				//BootReceiver
+				
 				db = dObject.dbOpen();
 				db.beginTransaction();
 				dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
@@ -182,30 +176,22 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				dObject.dbClose(db);
-				if(isDebug){
-					Log.w(CNAME,"End " + execFrom);
-				}
+				if(isDebug) Log.w(CNAME,"End " + execFrom);
 			} else {
-				db = dObject.dbOpen();
-				cursor = dObject.dbQuery(db, "select count(id) from " + PSXValue.PREVINFO);
-				dObject.dbClose(db);
-				
-				if(cursor.getString(0).equals("0")){
+				if(dObject.countTable(PSXValue.PREVINFO) == 0) {
 					db = dObject.dbOpen();
 					db.beginTransaction();
 					dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
 					db.setTransactionSuccessful();
 					db.endTransaction();
 					dObject.dbClose(db);
-					if(isDebug)	{
-						Log.w(CNAME,"End prev deleted");
-					}
+					if(isDebug) Log.w(CNAME,"Prev has gone");
 				} else {
 					if(prevTime == 0L){
 						db = dObject.dbOpen();
 						cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
-						dObject.dbClose(db);
 						prevTime = Long.parseLong(cursor.getString(0));
+						dObject.dbClose(db);
 					}
 					if(totalTime <= prevTime){
 						db = dObject.dbOpen();
@@ -215,16 +201,14 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.setTransactionSuccessful();
 						db.endTransaction();
 						dObject.dbClose(db);
-						if(isDebug){
-							Log.w(CNAME,"End back");
-						}
+						if(isDebug) Log.w(CNAME,"Decrease cpu time");
 					} else {
+						if(isDebug) Log.w(CNAME,"Async 3rd part");
 						totalTime = totalTime - prevTime;
 						Long nTotalTime = 0L;
 						sql = "select name,ttime from " + PSXValue.PREVINFO;
 						db = dObject.dbOpen();
 						cursor = dObject.dbQuery(db, sql);
-						dObject.dbClose(db);
 						for(int i = 0;i < finalList.size();i++){
 							if(cursor.getCount() != 0) {
 								while(cursor.getPosition() < cursor.getCount()){
@@ -241,43 +225,29 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							finalList.get(i).rsize = (double)totalSize;
 							nTotalTime += finalList.get(i).ttime;
 						}
-						if(isDebug){
-							Log.e(CNAME,"Start 4");
-						}
+						dObject.dbClose(db);
+
 						if(nTotalTime > totalTime){
 							for(int i = 0;i < finalList.size();i++){
 								finalList.get(i).rtime = (double)nTotalTime;
 							}
 						}						
-						if(isDebug){
-							Log.e(CNAME,"Start 5");
-						}
-
+						if(isDebug) Log.w(CNAME,"Async 4th part");
 						db = dObject.dbOpen();
 						db.beginTransaction();
 						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
 						sql = "delete from " + PSXValue.PREVINFO;
 						dObject.doSQL(db,sql);
-						
-						pShared = new PSXShared(mContext);
-						int length = pShared.getLength();
-						calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-						sql = "delete from " + PSXValue.INFOTABLE
-								+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
-						dObject.doSQL(db,sql);
 						dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
-						//Log.w(CNAME,sql);
 						db.setTransactionSuccessful();
 						db.endTransaction();
 	
-						if(isDebug){
-							Log.e(CNAME,"Start 6");
-						}
 						dObject.dbClose(db);
+
 						if(isDebug){
 							Log.w(CNAME,"End Second");
 						}
-					}//if delete previnfo data.
+					}//totalTime <= prevTime
 				}//2nd execute
 			}//1st execute
 			result.bResult = true;

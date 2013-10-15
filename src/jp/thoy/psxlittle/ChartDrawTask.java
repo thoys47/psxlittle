@@ -9,6 +9,7 @@ import jp.thoy.psxlittle.R;
 
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.PointStyle;
+import org.achartengine.util.MathHelper;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -101,9 +102,9 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			switch(page){
 				case PSXValue.P_CPU:
 				case PSXValue.P_MEM:	
-					sql = "select datetime,ttime/rtime,tsize/rsize from " + PSXValue.INFOTABLE
+					sql = "select datetime,sum(ttime)/rtime,sum(tsize)/rsize from " + PSXValue.INFOTABLE
 					+ " where key = '" + params[0].key + "' and datetime >= '" + fString + "'"
-					+ " order by datetime";
+					+ " group by key,datetime";
 					break;
 				case PSXValue.P_BATT:
 					sql = "select datetime,max(level),max(status),max(plugged) from " + PSXValue.BATTINFO
@@ -139,27 +140,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 				calendar.add(Calendar.MINUTE, interval);
 				String tString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
-				if(isDebug){
-					//Log.w(CNAME,"data=" + cursor.getString(0) + " fString=" + fString + " tString=" + tString);
-				}
-				
 				values[i] = getValue(fString,tString,cursor,page);
 				if(page == PSXValue.P_BATT){
 					if(values[i] == 0.0 && i > 1){
 						values[i] = values[i - 1];
 					}
 				}
-				
-				//if(chartSettings.max < (int)((values[i] * 1.3) + 0.5)){
-				//	chartSettings.max = (int)((values[i] * 1.3) + 0.5);
-				//}
 			}
-			//if(chartSettings.max < 1){
-			//	chartSettings.max = 1;
-			//}
-			//if(page == PSXValue.P_BATT){
-				chartSettings.max = 120;
-			//}
+			chartSettings.max = 120;
 			chartSettings.x.add(x);
 			chartSettings.values.add(values);
 		} catch (Exception ex) {
@@ -174,7 +162,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 	}
 	
 	private double getValue(String fString,String tString,Cursor cursor,int page) {
-		double ret = 0.0;
+		double ret = MathHelper.NULL_VALUE;
 		cursor.moveToFirst();
 		while(cursor.getPosition() < cursor.getCount()){
 			String datetime = cursor.getString(0);
@@ -184,13 +172,13 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				}
 				switch(page){
 				case PSXValue.P_CPU:
-					ret = Double.parseDouble(cursor.getString(1)) * 100.0;
+					ret = cursor.getDouble(1) * 100.0;
 					break;
 				case PSXValue.P_MEM:
-					ret = Double.parseDouble(cursor.getString(2)) * 100.0;
+					ret = cursor.getDouble(2) * 100.0;
 					break;
 				case PSXValue.P_BATT:
-					ret = Double.parseDouble(cursor.getString(1));
+					ret = cursor.getDouble(1);
 					break;
 				}
 				break;

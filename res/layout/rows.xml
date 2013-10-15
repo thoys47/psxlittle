@@ -47,7 +47,16 @@
         android:layout_below="@+id/cpuBar"
         android:text=""
         android:textAppearance="@style/listMidium" />
-
+    
+    <TextView
+        android:id="@+id/textCPUAvg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/textCPUUse"
+        android:text=""
+        android:textAppearance="@style/listMidium" />
+    
     <TextView
         android:id="@+id/textSysName"
         android:layout_width="wrap_content"

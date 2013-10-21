@@ -15,8 +15,29 @@ import android.util.Log;
 
 public class PSXService extends Service {
 	static String CNAME;
-	final static boolean isDebug = PSXValue.isDebug;
+	final static boolean isDebug = true;
 	
+
+	@Override
+	public void onLowMemory() {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onLowMemory();
+		Context context = getApplicationContext();
+		TraceLog saveTrace = new TraceLog(context);
+		saveTrace.saveDebug("onLowMemory");
+		Log.e(CNAME,"onLowMemory");
+	}
+
+
+	@Override
+	public void onTrimMemory(int level) {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onTrimMemory(level);
+		Context context = getApplicationContext();
+		TraceLog saveTrace = new TraceLog(context);
+		saveTrace.saveDebug("onTrimMemory");
+		Log.e(CNAME,"onTrimMemory");
+	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -24,21 +45,28 @@ public class PSXService extends Service {
 		Context context = getApplicationContext();
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(context));
 		CNAME = CommTools.getLastPart(context.getClass().getName(),".");
+		if(isDebug) Log.w(CNAME,"service 1");
 
-		//if((calendar.get(Calendar.MINUTE) % interval) == 0  || checkBefore(context,interval)) {
 		PSXAsyncTask aTask = new PSXAsyncTask();
-		Param  mParam = new Param();
-		ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
-		mParam.cParam = context;
-		mParam.aParam = mActivityManager;
-		mParam.sParam = intent.getAction();
-		mParam.clParam = CNAME;
-		aTask.execute(mParam);
+		Param  param = new Param();
+		
+		if(isDebug) {
+			Log.w(CNAME,"c=" + context.toString());
+			Log.w(CNAME,"s=" + intent.getAction());
+		}
+		
+		param.cParam = context;
+		param.sParam = intent.getAction();
+		aTask.execute(param);
+
+		if(isDebug) Log.w(CNAME,"service 2");
 
 		PSXShared pShared = new PSXShared(context);
 		pShared.putLastExec(Calendar.getInstance());
 		
+		if(isDebug) Log.w(CNAME,"service 3");
 		storeBatteryInfo(context);
+		if(isDebug) Log.w(CNAME,"service 4");
 
 		/*
 		RegistTask rTask = new RegistTask(context);
@@ -70,7 +98,7 @@ public class PSXService extends Service {
 		DataObject dObject = new DataObject(context);
 		SQLiteDatabase db = dObject.dbOpen();
 		String sql = DataObject.makeBaseSQL("INSERT", PSXValue.BATTINFO);
-		sql += "null,";
+		sql += "(null,";
 		sql += String.valueOf(bInfo.rLevel) + ",";
 		sql += "'" + bInfo.status + "',";
 		sql += "'" + bInfo.plugged + "',";

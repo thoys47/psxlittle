@@ -35,17 +35,7 @@ public class PSXShared {
 		SharedPreferences preferences = getSharedPrefs();
 		return preferences.getLong(PSXValue.LAST_EXECUTE,PSXValue.DEFLAST);
 	}
-	public Long getPrevTime(){
-		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getLong(PSXValue.PREV_CPU_TIME,PSXValue.DEFPREV);
-	}
-	
-	public Long getLastBattery(){
-		// If NOT exist return 0L.
-		SharedPreferences preferences = getSharedPrefs();
-		return preferences.getLong(PSXValue.LAST_RCV_BATT,PSXValue.DEFLAST);
-	}
-	
+
 	public void putLastExec(Calendar calendar){
 		SharedPreferences preferences = getSharedPrefs();
 		
@@ -67,22 +57,6 @@ public class PSXShared {
 		
 		Editor editor = preferences.edit();
 		editor.putInt(PSXValue.LENGTH, length);
-		editor.commit();
-	}
-
-	public void putPrevTime(Long time){
-		SharedPreferences preferences = getSharedPrefs();
-		
-		Editor editor = preferences.edit();
-		editor.putLong(PSXValue.PREV_CPU_TIME, time);
-		editor.commit();
-	}
-
-	public void putLastBattery(Calendar calendar){
-		SharedPreferences preferences = getSharedPrefs();
-		
-		Editor editor = preferences.edit();
-		editor.putLong(PSXValue.LAST_RCV_BATT, calendar.getTimeInMillis());
 		editor.commit();
 	}
 }

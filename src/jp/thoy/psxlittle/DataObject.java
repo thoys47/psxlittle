@@ -9,13 +9,14 @@ import java.util.Calendar;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
 public class DataObject {
 
 	Context mContext;
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	final static boolean isDebug = PSXValue.isDebug;
+	final static boolean isDebug = false;
 	
 	
 	final Calendar calendar = Calendar.getInstance();
@@ -95,7 +96,7 @@ public class DataObject {
 				}
 			}
 			sql = sql.substring(0, sql.length() - 1);
-			sql += ") values (";
+			sql += ") values ";
 		} else if(option.equals("SELECT")){
 			if(tablename.equals(PSXValue.INFOTABLE)){
 				sql = "SELECT ";
@@ -179,31 +180,55 @@ public class DataObject {
 		}
 	}
 	
-	public void insertInfo(SQLiteDatabase mdb,ArrayList<InfoTable> list,String tablename){
+	public void insertInfo(SQLiteDatabase db,ArrayList<InfoTable> list,String tablename){
 
 		String sql = "";
 		try{
+			sql = makeBaseSQL("INSERT",tablename);
+			if(tablename.equals(PSXValue.INFOTABLE) || tablename.equals(PSXValue.TEMPINFO)){
+				sql += "(?,?,?,?,?,?,?,?)";
+			} else if(tablename.equals(PSXValue.PREVINFO)){
+				sql += "(?,?,?)";
+			}
+			
+			SQLiteStatement stmt = db.compileStatement(sql);
 			for(int i = 0;i < list.size();i++){
 				if(tablename.equals(PSXValue.INFOTABLE) || tablename.equals(PSXValue.TEMPINFO)){
-					sql = makeBaseSQL("INSERT",tablename);
-					sql += "null,";
-					sql += "'" + list.get(i).name + "',";
-					sql += "'" + list.get(i).key + "',";
-					sql += String.valueOf(list.get(i).ttime) + ",";
-					sql += String.valueOf(list.get(i).rtime) + ",";
-					sql += String.valueOf(list.get(i).tsize) + ",";
-					sql += String.valueOf(list.get(i).rsize) + ",";
-					sql += "'" + list.get(i).datetime + "')";
+					if(isDebug){
+						Log.w(CNAME,"1" + sql);
+					}
+					stmt.bindNull(1);
+					stmt.bindString(2, list.get(i).name);
+					stmt.bindString(3, list.get(i).key);
+					stmt.bindLong(4, list.get(i).ttime);
+					if(list.get(i).rtime != null){
+						stmt.bindDouble(5, list.get(i).rtime);
+					} else {
+						stmt.bindNull(5);
+					}
+					stmt.bindLong(6, list.get(i).tsize);
+					if(list.get(i).rsize != null){
+						stmt.bindDouble(7, list.get(i).rsize);
+					} else {
+						stmt.bindNull(7);
+					}
+					if(list.get(i).datetime != null) {
+						stmt.bindString(8, list.get(i).datetime);
+					} else {
+						stmt.bindNull(8);
+					}
+					if(isDebug){
+						Log.w(CNAME,"2" + sql);
+					}
 				} else if(tablename.equals(PSXValue.PREVINFO)){
-					sql = makeBaseSQL("INSERT",tablename);
-					sql += "null,";
-					sql += "'" + list.get(i).name + "',";
-					sql += String.valueOf(list.get(i).ttime) + ")";
+					stmt.bindNull(1);
+					stmt.bindString(2, list.get(i).name);
+					stmt.bindLong(3, list.get(i).ttime);
 				}
-				mdb.execSQL(sql);
 				if(isDebug){
 					Log.w(CNAME,sql);
 				}
+				stmt.execute();
 			}
 	
 		} catch (Exception ex) {
@@ -283,7 +308,19 @@ public class DataObject {
 		    		while(cursor.getPosition() < cursor.getCount()){
 		    			line = "";
 		    			for(int j = 0;j < num;j++){
-			        		line += cursor.getString(j);
+		    				switch(cursor.getType(j)){
+		    					case Cursor.FIELD_TYPE_INTEGER:
+					        		line += String.valueOf(cursor.getInt(j));
+					        		break;
+		    					case Cursor.FIELD_TYPE_FLOAT:
+					        		line += String.valueOf(cursor.getDouble(j));
+					        		break;
+		    					case Cursor.FIELD_TYPE_STRING:
+					        		line += "\"" + cursor.getString(j) + "\"";
+					        		break;
+					        	default :
+					        		line += "\"" + cursor.getString(j) + "\"";
+		    				}
 			        		if(j != num - 1) {
 			        			line += ",";
 			        		}

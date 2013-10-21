@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = false;
+	private final static boolean isDebug = true;
 	Context mContext;
 	
 	@Override
@@ -84,9 +84,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 								+ Integer.parseInt(st.substring(0, st.length() - 1));
 						dList.datetime = "";
 						
-						totalTime += dList.ttime;
-						totalSize += dList.tsize;
-						
+						//totalTime += dList.ttime;
+						//totalSize += dList.tsize;
 						tempList.add(dList);
 					}
 				}
@@ -94,25 +93,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			reader.close();
 			process.waitFor();
 			
-			command = "cat /proc/stat";
-			process = runtime.exec(command);
-			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String[] temp3 = new String[11];
-			while ((line = reader.readLine()) != null) {
-				temp3 = line.split("[\\s]+");
-				if(temp3[1].equals("cpu")){
-					totalTime = Long.parseLong(temp3[1]) + Long.parseLong(temp3[2]) + Long.parseLong(temp3[3]) + Long.parseLong(temp3[4]);
-					break;
-				}
-			}
-			reader.close();
-			process.waitFor();
-			PSXShared pShared = new PSXShared(mContext);
-			prevTime = pShared.getPrevTime();
-			pShared.putPrevTime(totalTime);
-			
 		} catch (Exception ex) {
-			saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
 			saveTrace.saveLog(ex,CNAME + mname);
 			Log.w(CNAME,ex.getMessage());
@@ -142,14 +123,13 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							+ PSXValue.TEMPINFO + " group by name order by name desc";
 			cursor = dObject.dbQuery(db, sql);
 			
-			dObject.dbClose(db);
 			PSXShared pShared = new PSXShared(mContext);
 			int interval = pShared.getInterval();
 			calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
 			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
 			String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
 
-			for(int i = 0;i < cursor.getCount();i++){
+			while(cursor.getPosition() < cursor.getCount()){
 				InfoTable fList = new InfoTable();
 				fList.name = cursor.getString(0);
 				fList.key = cursor.getString(1);
@@ -157,8 +137,12 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				fList.tsize = cursor.getInt(3);
 				fList.datetime = datetime;
 				finalList.add(fList);
+				totalTime += fList.ttime;
+				totalSize += fList.tsize;
+				//Log.w(CNAME,"n=" + fList.name + " t=" + fList.ttime);
 				cursor.moveToNext();
 			}
+			dObject.dbClose(db);
 			
 			for(int i = 0; i < finalList.size();i++){
 				InfoTable dList = new InfoTable();
@@ -188,13 +172,13 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					db.endTransaction();
 					dObject.dbClose(db);
 					if(isDebug) Log.w(CNAME,"Prev has gone");
+					saveTrace.saveDebug("Prev has gone");
 				} else {
-					if(prevTime == 0L){
-						db = dObject.dbOpen();
-						cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
-						prevTime = Long.parseLong(cursor.getString(0));
-						dObject.dbClose(db);
-					}
+					db = dObject.dbOpen();
+					cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
+					prevTime = Long.parseLong(cursor.getString(0));
+					dObject.dbClose(db);
+
 					if(totalTime <= prevTime){
 						db = dObject.dbOpen();
 						db.beginTransaction();
@@ -203,11 +187,14 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.setTransactionSuccessful();
 						db.endTransaction();
 						dObject.dbClose(db);
+						
 						if(isDebug) Log.w(CNAME,"Decrease cpu time");
+						saveTrace.saveDebug("ttl=" + totalTime + " pre=" + prevTime);
 					} else {
 						if(isDebug) Log.w(CNAME,"Async 3rd part");
-						totalTime = totalTime - prevTime;
-						Long nTotalTime = 0L;
+						//Log.w(CNAME,"t=" + totalTime + " p=" + prevTime);
+						//totalTime = totalTime - prevTime;
+						totalTime = 0L;
 						sql = "select name,ttime from " + PSXValue.PREVINFO;
 						db = dObject.dbOpen();
 						cursor = dObject.dbQuery(db, sql);
@@ -225,15 +212,18 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							}
 							finalList.get(i).rtime = (double)totalTime;
 							finalList.get(i).rsize = (double)totalSize;
-							nTotalTime += finalList.get(i).ttime;
+							totalTime += finalList.get(i).ttime;
+							//Log.w(CNAME,"n=" + finalList.get(i).name + " t=" + finalList.get(i).ttime);
 						}
 						dObject.dbClose(db);
 
-						if(nTotalTime > totalTime){
-							for(int i = 0;i < finalList.size();i++){
-								finalList.get(i).rtime = (double)nTotalTime;
-							}
-						}						
+						//if(nTotalTime > totalTime){
+						for(int i = 0;i < finalList.size();i++){
+							finalList.get(i).rtime = (double)totalTime;
+						}
+						//	Log.e(CNAME,"nttl=" + nTotalTime + " ttl=" + totalTime);
+						//	saveTrace.saveDebug("nttl=" + nTotalTime + " ttl=" + totalTime);
+						//}						
 						if(isDebug) Log.w(CNAME,"Async 4th part");
 						db = dObject.dbOpen();
 						db.beginTransaction();
@@ -243,7 +233,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
 						db.setTransactionSuccessful();
 						db.endTransaction();
-	
 						dObject.dbClose(db);
 
 						if(isDebug){
@@ -251,14 +240,13 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						}
 					}//totalTime <= prevTime
 				}//2nd execute
-			}//1st execute
+			}//execute boot or install
 			result.bResult = true;
 		} catch (Exception ex) {
 			if (db != null){
 				db.endTransaction();
 				db.close();
 			}
-			saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
 			saveTrace.saveLog(ex,CNAME + mname);
 			Log.e(CNAME,ex.getMessage());

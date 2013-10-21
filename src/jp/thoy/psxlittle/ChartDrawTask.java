@@ -92,9 +92,6 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			int length = pShared.getLength();
 			int interval = pShared.getInterval();
 			calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-			if(page == PSXValue.P_BATT) {
-				interval = 5;
-			}
 			calendar.add(Calendar.MINUTE, ((-1) * (calendar.get(Calendar.MINUTE) % interval)) + interval);
 			calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND)); 
 			String fString = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);

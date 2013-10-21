@@ -26,11 +26,8 @@ public class BootReceiver extends BroadcastReceiver {
 		if(action.equals(Intent.ACTION_BOOT_COMPLETED)){
 			PSXAsyncTask aTask = new PSXAsyncTask();
 			Param  param = new Param();
-			ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
 			param.cParam = context;
-			param.aParam = mActivityManager;
 			param.sParam = PSXValue.BOOT;
-			param.clParam = CNAME;
 			aTask.execute(param);
 			PSXShared pShared = new PSXShared(context);
 			pShared.putLastExec(Calendar.getInstance());

@@ -97,11 +97,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 			}
 			PSXAsyncTask aTask = new PSXAsyncTask();
 			Param  mParam = new Param();
-			ActivityManager mActivityManager = (ActivityManager)context.getSystemService(Activity.ACTIVITY_SERVICE);
 			mParam.cParam = context;
-			mParam.aParam = mActivityManager;
 			mParam.sParam = PSXValue.INSTALL;
-			mParam.clParam = CNAME;
 			aTask.execute(mParam);
 
 			pShared.putLastExec(Calendar.getInstance());

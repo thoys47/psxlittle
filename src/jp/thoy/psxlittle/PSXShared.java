@@ -36,6 +36,21 @@ public class PSXShared {
 		return preferences.getLong(PSXValue.LAST_EXECUTE,PSXValue.DEFLAST);
 	}
 
+	public Long getPrevTime(){
+		// If NOT exist return 0L.
+		SharedPreferences preferences = getSharedPrefs();
+		return preferences.getLong(PSXValue.PREVTIME,PSXValue.DEFPREV);
+	}
+
+	public void putPrevTime(Long time){
+		// If NOT exist return 0L.
+		SharedPreferences preferences = getSharedPrefs();
+		
+		Editor editor = preferences.edit();
+		editor.putLong(PSXValue.PREVTIME, time);
+		editor.commit();
+	}
+
 	public void putLastExec(Calendar calendar){
 		SharedPreferences preferences = getSharedPrefs();
 		

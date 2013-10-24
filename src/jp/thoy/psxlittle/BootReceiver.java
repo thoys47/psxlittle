@@ -1,14 +1,10 @@
 package jp.thoy.psxlittle;
 
 import java.util.Calendar;
-import java.util.TimeZone;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {

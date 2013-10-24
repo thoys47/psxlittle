@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -14,7 +16,7 @@ import android.util.Log;
 
 public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
-	private final static boolean isDebug = true;
+	private final static boolean isDebug = false;
 	Context mContext;
 	
 	@Override
@@ -27,6 +29,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 	protected void onPostExecute(Result result) {
 		// TODO 自動生成されたメソッド・スタブ
 		super.onPostExecute(result);
+
 	}
 
 	@Override
@@ -45,6 +48,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			Log.w(CNAME,"from=" + execFrom);
 			saveTrace.saveDebug("Start:" + execFrom);
 		}
+
+		storeBatteryInfo(mContext);
 		
 		Result result = new Result();
 		Long totalTime = 0L;
@@ -93,6 +98,23 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			reader.close();
 			process.waitFor();
 			
+			command = "cat /proc/stat";
+			process = runtime.exec(command);
+			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String[] temp3 = new String[11];
+			while ((line = reader.readLine()) != null) {
+				temp3 = line.split("[\\s]+");
+				if(temp3[0].equals("cpu")){
+					totalTime = Long.parseLong(temp3[1]) + Long.parseLong(temp3[2]) + Long.parseLong(temp3[3]) + Long.parseLong(temp3[4]);
+					break;
+				}
+			}
+			reader.close();
+			process.waitFor();
+			PSXShared pShared = new PSXShared(mContext);
+			prevTime = pShared.getPrevTime();
+			pShared.putPrevTime(totalTime);
+			
 		} catch (Exception ex) {
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
 			saveTrace.saveLog(ex,CNAME + mname);
@@ -102,10 +124,10 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			return result;
 		}
 
-		DataObject dObject;
-		SQLiteDatabase db = null;
-		String sql;
 		try{
+			DataObject dObject;
+			SQLiteDatabase db = null;
+			String sql;
 			dObject = new DataObject(mContext);
 			Cursor cursor;
 
@@ -137,9 +159,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				fList.tsize = cursor.getInt(3);
 				fList.datetime = datetime;
 				finalList.add(fList);
-				totalTime += fList.ttime;
 				totalSize += fList.tsize;
-				//Log.w(CNAME,"n=" + fList.name + " t=" + fList.ttime);
 				cursor.moveToNext();
 			}
 			dObject.dbClose(db);
@@ -174,11 +194,12 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					if(isDebug) Log.w(CNAME,"Prev has gone");
 					saveTrace.saveDebug("Prev has gone");
 				} else {
-					db = dObject.dbOpen();
-					cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
-					prevTime = Long.parseLong(cursor.getString(0));
-					dObject.dbClose(db);
-
+					if(prevTime == 0L){
+						db = dObject.dbOpen();
+						cursor = dObject.dbQuery(db, "select sum(ttime) from " + PSXValue.PREVINFO);
+						prevTime = Long.parseLong(cursor.getString(0));
+						dObject.dbClose(db);
+					}
 					if(totalTime <= prevTime){
 						db = dObject.dbOpen();
 						db.beginTransaction();
@@ -193,8 +214,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					} else {
 						if(isDebug) Log.w(CNAME,"Async 3rd part");
 						//Log.w(CNAME,"t=" + totalTime + " p=" + prevTime);
-						//totalTime = totalTime - prevTime;
-						totalTime = 0L;
+						totalTime = totalTime - prevTime;
+						Long nTotalTime = 0L;
 						sql = "select name,ttime from " + PSXValue.PREVINFO;
 						db = dObject.dbOpen();
 						cursor = dObject.dbQuery(db, sql);
@@ -210,16 +231,23 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 								}
 								cursor.moveToFirst();
 							}
-							finalList.get(i).rtime = (double)totalTime;
+							//finalList.get(i).rtime = (double)totalTime;
 							finalList.get(i).rsize = (double)totalSize;
-							totalTime += finalList.get(i).ttime;
+							nTotalTime += finalList.get(i).ttime;
 							//Log.w(CNAME,"n=" + finalList.get(i).name + " t=" + finalList.get(i).ttime);
 						}
 						dObject.dbClose(db);
 
-						//if(nTotalTime > totalTime){
-						for(int i = 0;i < finalList.size();i++){
-							finalList.get(i).rtime = (double)totalTime;
+						if(nTotalTime > totalTime){
+							for(int i = 0;i < finalList.size();i++){
+								finalList.get(i).rtime = (double)nTotalTime;
+							}
+							Log.e(CNAME,"nTotalTime > totalTime n=" + nTotalTime + " t=" + totalTime);
+						} else {
+							for(int i = 0;i < finalList.size();i++){
+								finalList.get(i).rtime = (double)totalTime;
+							}
+							Log.e(CNAME,"nTotalTime < totalTime n=" + nTotalTime + " t=" + totalTime);
 						}
 						//	Log.e(CNAME,"nttl=" + nTotalTime + " ttl=" + totalTime);
 						//	saveTrace.saveDebug("nttl=" + nTotalTime + " ttl=" + totalTime);
@@ -243,10 +271,6 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			}//execute boot or install
 			result.bResult = true;
 		} catch (Exception ex) {
-			if (db != null){
-				db.endTransaction();
-				db.close();
-			}
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
 			saveTrace.saveLog(ex,CNAME + mname);
 			Log.e(CNAME,ex.getMessage());
@@ -256,5 +280,33 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		result.bResult = true;
 		return result;
 	}
-	
+	private void storeBatteryInfo(Context context){
+		
+		int interval;
+		PSXShared pShared = new PSXShared(context);
+		interval = pShared.getInterval();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		calendar.add(Calendar.MINUTE, (-1) * calendar.get(Calendar.MINUTE) % interval);
+		calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
+		String datetime = CommTools.CalendarToString(calendar, CommTools.DATETIMELONG);
+		
+		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		Intent intent = context.registerReceiver(null, ifilter);
+		GetBatteryInfo batteryInfo = new GetBatteryInfo();
+		BatteryInfo bInfo = batteryInfo.getInfo(intent);
+
+		DataObject dObject = new DataObject(context);
+		SQLiteDatabase db = dObject.dbOpen();
+		String sql = DataObject.makeBaseSQL("INSERT", PSXValue.BATTINFO);
+		sql += "(null,";
+		sql += String.valueOf(bInfo.rLevel) + ",";
+		sql += "'" + bInfo.status + "',";
+		sql += "'" + bInfo.plugged + "',";
+		sql += String.valueOf(bInfo.temp) + ',';
+		sql += "'" + PSXValue.NAME_BATT + "',";
+		sql += "'" + datetime + "')";
+		dObject.doSQL(db, sql);
+		dObject.dbClose(db);
+	}
+
 }

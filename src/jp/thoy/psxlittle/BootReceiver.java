@@ -32,10 +32,12 @@ public class BootReceiver extends BroadcastReceiver {
 		} else {
 			RegistTask rTask = new RegistTask(context);
 			rTask.StartCommand();
-			TraceLog saveLog = new TraceLog(context);
-			saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));
 		}
-		
+		if(isDebug){
+			Log.w(CNAME,"action=" + action);
+		}
+		TraceLog saveLog = new TraceLog(context);
+		saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));
 	}
 	
 	

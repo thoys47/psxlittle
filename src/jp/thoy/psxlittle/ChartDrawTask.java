@@ -99,7 +99,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			switch(page){
 				case PSXValue.P_CPU:
 					sql = "select datetime,sum(ttime)/rtime from " + PSXValue.INFOTABLE
-					+ " where key = '" + params[0].key + "' and rsize > 0 and datetime >= '" + fString + "'"
+					+ " where key = '" + params[0].key + "' and rtime > 0 and datetime >= '" + fString + "'"
 					+ " group by key,datetime order by datetime";
 					break;
 				case PSXValue.P_MEM:	
@@ -123,7 +123,6 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				dObject.dbClose(db);
 				return null;
 			}
-			
 			
 			int totalnum = (length * 60) / interval;
 			int datanum = cursor.getCount();

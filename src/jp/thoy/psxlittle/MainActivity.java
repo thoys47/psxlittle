@@ -2,13 +2,10 @@ package jp.thoy.psxlittle;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 import jp.thoy.psxlittle.R;
 
-import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;

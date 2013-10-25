@@ -27,14 +27,14 @@ public class BootReceiver extends BroadcastReceiver {
 			aTask.execute(param);
 			PSXShared pShared = new PSXShared(context);
 			pShared.putLastExec(Calendar.getInstance());
+			RegistTask rTask = new RegistTask(context);
+			rTask.StartCommand();
 		} else {
 			RegistTask rTask = new RegistTask(context);
 			rTask.StartCommand();
 			TraceLog saveLog = new TraceLog(context);
 			saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));
 		}
-		
-		Log.w(CNAME,"action=" + intent.getAction());
 		
 	}
 	

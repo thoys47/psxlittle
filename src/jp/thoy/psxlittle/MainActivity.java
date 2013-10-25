@@ -3,6 +3,7 @@ package jp.thoy.psxlittle;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import jp.thoy.psxlittle.R;
 
@@ -31,13 +32,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
 	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
 	private final static boolean isDebug = PSXValue.isDebug;
-	
-	final static Calendar calendar = Calendar.getInstance();
-	final static int year = calendar.get(Calendar.YEAR);
-	final static int month = calendar.get(Calendar.MONTH);
-	final static int day = calendar.get(Calendar.DAY_OF_MONTH);
-	final static int hour = calendar.get(Calendar.HOUR_OF_DAY);
-	final static int min = calendar.get(Calendar.MINUTE);
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -126,6 +120,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		rTask.StartCommand();
 		
 		int length = pShared.getLength();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
 		SQLiteDatabase db = dObject.dbOpen();
 		String sql = "delete from " + PSXValue.INFOTABLE

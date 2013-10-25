@@ -42,7 +42,7 @@ public class RegistTask {
 			//saveLog.saveDebug("next:" + CommTools.CalendarToString(calendar, CommTools.TIMELONG));
 		}
 		
-		mAlarmManager.cancel(pIntent);
+		//mAlarmManager.cancel(pIntent);
 		mAlarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval * 1000 * 60, pIntent);
 		//mAlarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pIntent);
 		//Log.e(CNAME,"next:" + CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));

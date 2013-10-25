@@ -98,10 +98,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			String sql = "";
 			switch(page){
 				case PSXValue.P_CPU:
+					sql = "select datetime,sum(ttime)/rtime from " + PSXValue.INFOTABLE
+					+ " where key = '" + params[0].key + "' and rsize > 0 and datetime >= '" + fString + "'"
+					+ " group by key,datetime order by datetime";
+					break;
 				case PSXValue.P_MEM:	
-					sql = "select datetime,sum(ttime)/rtime,sum(tsize)/rsize from " + PSXValue.INFOTABLE
-					+ " where key = '" + params[0].key + "' and datetime >= '" + fString + "'"
-					+ " group by key,datetime";
+					sql = "select datetime,sum(tsize)/rsize from " + PSXValue.INFOTABLE
+					+ " where key = '" + params[0].key + "' and rsize > 0 and datetime >= '" + fString + "'"
+					+ " group by key,datetime order by datetime";
 					break;
 				case PSXValue.P_BATT:
 					sql = "select datetime,max(level),max(status),max(plugged) from " + PSXValue.BATTINFO
@@ -113,12 +117,13 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				Log.w(CNAME,sql);
 			}
 			
-			SQLiteDatabase mdb = dObject.dbOpen();
-			Cursor cursor = dObject.dbQuery(mdb, sql);
-			mdb.close();
+			SQLiteDatabase db = dObject.dbOpen();
+			Cursor cursor = dObject.dbQuery(db, sql);
 			if(cursor == null || cursor.getCount() == 0){
+				dObject.dbClose(db);
 				return null;
 			}
+			
 			
 			int totalnum = (length * 60) / interval;
 			int datanum = cursor.getCount();
@@ -143,10 +148,24 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 						values[i] = values[i - 1];
 					}
 				}
+				if(values[i] != MathHelper.NULL_VALUE){
+					if(values[i] * 1.3 > chartSettings.max){
+						chartSettings.max = (int)(values[i] * 1.3);
+					}
+				}
 			}
-			chartSettings.max = 120;
+			if(chartSettings.max > 5) {
+				chartSettings.max += 5 - (chartSettings.max % 5);
+			} else {
+				chartSettings.max += 1;
+			}
+			
+			if(page == PSXValue.P_BATT) {
+				chartSettings.max = 120;
+			}
 			chartSettings.x.add(x);
 			chartSettings.values.add(values);
+			dObject.dbClose(db);
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
@@ -165,14 +184,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			String datetime = cursor.getString(0);
 			if(datetime.compareTo(fString) >= 0 && datetime.compareTo(tString) < 0){
 				if(isDebug){
-					Log.w(CNAME,"data=" + cursor.getString(1));
+					Log.w(CNAME,"date=" + datetime + " data=" + cursor.getString(1));
 				}
 				switch(page){
 				case PSXValue.P_CPU:
 					ret = cursor.getDouble(1) * 100.0;
 					break;
 				case PSXValue.P_MEM:
-					ret = cursor.getDouble(2) * 100.0;
+					ret = cursor.getDouble(1) * 100.0;
 					break;
 				case PSXValue.P_BATT:
 					ret = cursor.getDouble(1);
@@ -182,6 +201,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			}
 			cursor.moveToNext();
 		}
+		if(isDebug) Log.w(CNAME,"r="+ret);
 		return ret;
 	}
 	

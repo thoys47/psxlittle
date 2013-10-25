@@ -205,6 +205,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.beginTransaction();
 						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
 						dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
+						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
 						db.setTransactionSuccessful();
 						db.endTransaction();
 						dObject.dbClose(db);
@@ -242,12 +243,10 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							for(int i = 0;i < finalList.size();i++){
 								finalList.get(i).rtime = (double)nTotalTime;
 							}
-							Log.e(CNAME,"nTotalTime > totalTime n=" + nTotalTime + " t=" + totalTime);
 						} else {
 							for(int i = 0;i < finalList.size();i++){
 								finalList.get(i).rtime = (double)totalTime;
 							}
-							Log.e(CNAME,"nTotalTime < totalTime n=" + nTotalTime + " t=" + totalTime);
 						}
 						//	Log.e(CNAME,"nttl=" + nTotalTime + " ttl=" + totalTime);
 						//	saveTrace.saveDebug("nttl=" + nTotalTime + " ttl=" + totalTime);

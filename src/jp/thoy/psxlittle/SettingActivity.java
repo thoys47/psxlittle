@@ -4,12 +4,15 @@ import jp.thoy.psxlittle.R;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Toast;
 
 public class SettingActivity extends Activity implements OnCheckedChangeListener {
-	
+	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final static boolean isDebug = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO 自動生成されたメソッド・スタブ
@@ -66,10 +69,11 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 		String name;
 		int interval;
 		int length;
+		Context context = getApplicationContext();
 
-		PSXShared pShared = new PSXShared(getApplicationContext());
+		PSXShared pShared = new PSXShared(context);
 		int groupId =  group.getId();
-		DataObject mDO = new DataObject(getApplicationContext());
+		DataObject dObject = new DataObject(context);
 		
 		switch(groupId){
 			case R.id.radioInterval:
@@ -115,7 +119,7 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 					default:
 						name = PSXValue.INFOTABLE;	
 				}
-				Toast.makeText(getApplicationContext(),String.valueOf(mDO.countTable(name)),Toast.LENGTH_SHORT).show();
+				Toast.makeText(context,String.valueOf(dObject.countTable(name)),Toast.LENGTH_SHORT).show();
 				break;
 			case R.id.radioExport:
 				switch(checkedId){
@@ -131,7 +135,10 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 					default:
 						name = PSXValue.INFOTABLE;
 				}
-				Toast.makeText(getApplicationContext(), "exported items = " + mDO.exportData(name),Toast.LENGTH_SHORT).show();
+				Log.w(CNAME,name);
+				dObject.exportData(name);
+				Toast.makeText(context, getString(R.string.msgExport) + getExternalFilesDir(null).toString()
+						,Toast.LENGTH_LONG).show();
 				break;
 		}
 		

@@ -77,8 +77,8 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		chartSettings.styles = new PointStyle[]{styles[page]};
 		chartSettings.lineWidth = new float[]{10.0f};
 		chartSettings.chartName = key;
-		chartSettings.xString = "Time";
-		chartSettings.yString = "Rate(%)";
+		chartSettings.xString = mContext.getString(R.string.ttlTime);
+		chartSettings.yString = mContext.getString(R.string.ttlRate);
 		chartSettings.max = 0;
 		chartSettings.min = 0;
 	    

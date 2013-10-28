@@ -7,8 +7,8 @@
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
-    <string name="lblTrace">Trace</string>
-    <string name="lblDebug">Debug</string>
+    <string name="lblTrace">Show TraceFile</string>
+    <string name="lblDebug">Show DebugLog</string>
     <string name="action_debug">Debug</string>
     <string name="strnone2">no Strings</string>
     <string name="lblDescription">icon</string>
@@ -32,5 +32,8 @@
     <string name="ttlCPU">CPU info</string>
     <string name="ttlMEM">Memory info</string>
     <string name="ttlBATT">Battery info</string>
+    <string name="msgExport">Exported to </string>
+    <string name="ttlRate">Rate(%)</string>
+    <string name="ttlTime">Time</string>
     
 </resources>

@@ -264,11 +264,8 @@ public class DataObject {
 		SQLiteDatabase mdb = null;
 		int ret = 0;
 
-		File file = null;
-		file = new File(mContext.getExternalFilesDir(null), name + ".csv");
-		
 		try {
-
+			File file = new File(mContext.getExternalFilesDir(null).toString() + "/" + name + ".csv");
 			String sql = makeBaseSQL("SELECT",name);
 			mdb = this.dbOpen();
 			Cursor cursor = this.dbQuery(mdb, sql);

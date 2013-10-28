@@ -53,11 +53,11 @@ public class PagerAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		switch (position) {
 		case PSXValue.P_CPU:
-			return mContext.getResources().getString(R.string.ttlCPU);
+			return mContext.getString(R.string.ttlCPU);
 		case PSXValue.P_MEM:
-			return mContext.getResources().getString(R.string.ttlMEM);
+			return mContext.getString(R.string.ttlMEM);
 		case PSXValue.P_BATT:
-			return mContext.getResources().getString(R.string.ttlBATT);
+			return mContext.getString(R.string.ttlBATT);
 		}
 		return null;
 	}

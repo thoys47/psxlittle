@@ -73,6 +73,32 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 	}
 
 	@Override
+	protected void onDestroy() {
+		// TODO 自動生成されたメソッド・スタブ
+		super.onDestroy();
+		Context context = getApplicationContext();
+		DataObject dObject = new DataObject(context);
+		PSXShared pShared = new PSXShared(context);
+
+		int length = pShared.getLength();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		SQLiteDatabase db = dObject.dbOpen();
+		String sql = "delete from " + PSXValue.INFOTABLE
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(db,sql);
+		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
+		sql = "delete from " + PSXValue.BATTINFO
+				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
+		dObject.doSQL(db,sql);
+		if(isDebug){
+			Log.w(CNAME,sql);
+		}
+
+		dObject.dbClose(db);
+}
+
+	@Override
 	protected void onStart() {
 		// TODO 自動生成されたメソッド・スタブ
 		super.onStart();
@@ -116,22 +142,6 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		RegistTask rTask = new RegistTask(getApplicationContext());
 		rTask.StartCommand();
 		
-		int length = pShared.getLength();
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-		SQLiteDatabase db = dObject.dbOpen();
-		String sql = "delete from " + PSXValue.INFOTABLE
-				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
-		dObject.doSQL(db,sql);
-		calendar.add(Calendar.HOUR_OF_DAY, (-1) * length);
-		sql = "delete from " + PSXValue.BATTINFO
-				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
-		dObject.doSQL(db,sql);
-		if(isDebug){
-			Log.w(CNAME,sql);
-		}
-
-		dObject.dbClose(db);
 		if(isDebug){
 			Log.w(CNAME,"OnStart");
 		}

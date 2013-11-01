@@ -9,7 +9,7 @@ import android.widget.Toast;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class SettingActivity extends Activity implements OnCheckedChangeListener {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 
 	@Override
@@ -71,7 +71,9 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 		int groupId =  group.getId();
 		String name;
 		DataObject dObject = new DataObject(context);
-
+		
+		if(isDebug) Log.w(TAG,"id=" + checkedId);
+		
 		switch(groupId){
 			case R.id.radioInterval:
 				switch(checkedId){

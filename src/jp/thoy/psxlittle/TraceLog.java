@@ -16,7 +16,7 @@ import android.content.Context;
 public class TraceLog implements UncaughtExceptionHandler {
 	
 	final Context mContext;
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 
 	static final String TRACEFILE =  "psxlittle.trc";
@@ -134,8 +134,8 @@ public class TraceLog implements UncaughtExceptionHandler {
         return null;
 	}
 
-	public String getCName(String cname){
-		return cname.substring(cname.lastIndexOf(".") + 1, cname.length());
+	public String getTAG(String TAG){
+		return TAG.substring(TAG.lastIndexOf(".") + 1, TAG.length());
 	}
 
 	public String getAction(String action){

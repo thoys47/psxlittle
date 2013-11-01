@@ -12,7 +12,7 @@ import android.util.Log;
 public class DataObject {
 
 	Context mContext;
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 	
 	
@@ -131,12 +131,12 @@ public class DataObject {
 			} catch (Exception ex){
 				TraceLog saveTrace = new TraceLog(mContext);
 				String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-				saveTrace.saveLog(ex,CNAME + mname);
-				Log.e(CNAME,ex.getMessage());
+				saveTrace.saveLog(ex,TAG + mname);
+				Log.e(TAG,ex.getMessage());
 				ex.printStackTrace();
 			}
 		}
-		if(isDebug) Log.w(CNAME,"sql=" + sql);
+		if(isDebug) Log.w(TAG,"sql=" + sql);
 		return;
 	}
 	
@@ -149,8 +149,8 @@ public class DataObject {
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 		return null;
@@ -171,8 +171,8 @@ public class DataObject {
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
@@ -193,13 +193,13 @@ public class DataObject {
 				sql += "(?,?,?)";
 			}
 			
-			if(isDebug) Log.w(CNAME,"cnt=" + list.size());
+			if(isDebug) Log.w(TAG,"cnt=" + list.size());
 			
 			SQLiteStatement stmt = db.compileStatement(sql);
 			for(int i = 0;i < list.size();i++){
 				if(tablename.equals(PSXValue.INFOTABLE) || tablename.equals(PSXValue.TEMPINFO)){
 					if(isDebug){
-						Log.w(CNAME,"1" + sql);
+						Log.w(TAG,"1" + sql);
 					}
 					stmt.bindNull(1);
 					stmt.bindString(2, list.get(i).name);
@@ -222,7 +222,7 @@ public class DataObject {
 						stmt.bindNull(8);
 					}
 					if(isDebug){
-						Log.w(CNAME,"2" + sql);
+						Log.w(TAG,"2" + sql);
 					}
 				} else if(tablename.equals(PSXValue.PREVINFO)){
 					stmt.bindNull(1);
@@ -230,7 +230,7 @@ public class DataObject {
 					stmt.bindLong(3, list.get(i).ttime);
 				}
 				if(isDebug){
-					Log.w(CNAME,list.get(i).name);
+					Log.w(TAG,list.get(i).name);
 				}
 				stmt.execute();
 			}
@@ -238,8 +238,8 @@ public class DataObject {
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 	}
@@ -257,8 +257,8 @@ public class DataObject {
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 		return ret;

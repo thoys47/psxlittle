@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_h"
         android:layout_marginTop="@dimen/margin_v"
-        android:text="@string/strInterval"
+        android:text="@string/lblInterval"
         android:textAppearance="@style/listMidium" />
 	
 	<RadioGroup
@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/radioInterval"
-        android:text="@string/strLength"
+        android:text="@string/lblLength"
         android:layout_marginLeft="@dimen/margin_h"
         android:layout_marginTop="@dimen/margin_v"
         android:textAppearance="@style/listMidium" />
@@ -94,7 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:text="@string/strCount"
+        android:text="@string/lblCount"
         android:layout_below="@+id/radioLength"
         android:layout_marginLeft="@dimen/margin_h"
         android:layout_marginTop="@dimen/margin_v"

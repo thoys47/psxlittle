@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class MainActivity extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener {
 
-	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	private final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	private final static boolean isDebug = PSXValue.isDebug;
 
 	/**
@@ -63,8 +63,8 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(context);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 
@@ -90,7 +90,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				+ " where datetime < '" + CommTools.CalendarToString(calendar,CommTools.DATETIMELONG) + "'";
 		dObject.doSQL(db,sql);
 		if(isDebug){
-			Log.w(CNAME,sql);
+			Log.w(TAG,sql);
 		}
 
 		dObject.dbClose(db);
@@ -108,7 +108,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		long before = pShared.getLastExec();
 		if(before == 0L){
 			if(isDebug){
-				Log.w(CNAME,"install from main count" + dObject.countTable(PSXValue.PREVINFO));
+				Log.w(TAG,"install from main count" + dObject.countTable(PSXValue.PREVINFO));
 			}
 			PSXAsyncTask aTask = new PSXAsyncTask();
 			Param  mParam = new Param();
@@ -141,7 +141,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		rTask.StartCommand();
 		
 		if(isDebug){
-			Log.w(CNAME,"OnStart");
+			Log.w(TAG,"OnStart");
 		}
 	}
 
@@ -173,7 +173,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 					case PSXValue.P_MEM:
 						int cnt = mDO.countTable(PSXValue.INFOTABLE);
 						if(cnt == 0){
-							Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
+							Toast.makeText(context, getString(R.string.msgNoData), Toast.LENGTH_SHORT).show();
 							return super.onMenuItemSelected(featureId, item);
 						}
 						SummarizeData iCalc = new SummarizeData(context);
@@ -202,7 +202,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 
 						cnt = mDO.countTable(PSXValue.BATTINFO);
 						if(cnt == 0){
-							Toast.makeText(context, getString(R.string.strNoData), Toast.LENGTH_SHORT).show();
+							Toast.makeText(context, getString(R.string.msgNoData), Toast.LENGTH_SHORT).show();
 							return super.onMenuItemSelected(featureId, item);
 						}
 						
@@ -253,7 +253,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		TextView tView = (TextView)view.findViewById(R.id.textKey);
 		ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
 		Intent intent;
-		if(isDebug) Log.w(CNAME,"getText=" + tView.getText());
+		if(isDebug) Log.w(TAG,"getText=" + tView.getText());
 		intent = new Intent(view.getContext(),ChartActivity.class);
 		intent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
 		intent.putExtra("KEY",tView.getText());
@@ -271,7 +271,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 			try{
 				startActivity(intent);
 			} catch (Exception ex) {
-				Toast.makeText(view.getContext(), getString(R.string.strDontExec), Toast.LENGTH_SHORT).show();
+				Toast.makeText(view.getContext(), getString(R.string.msgDontExec), Toast.LENGTH_SHORT).show();
 			}
 		} else {
 			ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);

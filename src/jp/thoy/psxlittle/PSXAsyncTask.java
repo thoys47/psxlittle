@@ -15,7 +15,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
-	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	private final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	private final static boolean isDebug = false;
 	Context mContext;
 	
@@ -45,7 +45,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 		mContext = param[0].cParam;
 		TraceLog saveTrace = new TraceLog(mContext);
 		if(isDebug){
-			Log.w(CNAME,"from=" + execFrom);
+			Log.w(TAG,"from=" + execFrom);
 			saveTrace.saveDebug("Start:" + execFrom);
 		}
 
@@ -117,8 +117,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			
 		} catch (Exception ex) {
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.w(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.w(TAG,ex.getMessage());
 			ex.printStackTrace();
 			result.bResult = false;
 			return result;
@@ -131,7 +131,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			dObject = new DataObject(mContext);
 			Cursor cursor;
 
-			if(isDebug) Log.w(CNAME,"Async 1st part");
+			if(isDebug) Log.w(TAG,"Async 1st part");
 			//Same name process is merged
 			db = dObject.dbOpen();
 			db.beginTransaction();
@@ -171,7 +171,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				prevList.add(dList);
 			}
 
-			if(isDebug) Log.w(CNAME,"Async 2nd part");
+			if(isDebug) Log.w(TAG,"Async 2nd part");
 
 			if(execFrom.equals(PSXValue.BOOT) || execFrom.equals(PSXValue.INSTALL)) {
 				
@@ -182,7 +182,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 				db.setTransactionSuccessful();
 				db.endTransaction();
 				dObject.dbClose(db);
-				if(isDebug) Log.w(CNAME,"End " + execFrom);
+				if(isDebug) Log.w(TAG,"End " + execFrom);
 			} else {
 				if(dObject.countTable(PSXValue.PREVINFO) == 0) {
 					db = dObject.dbOpen();
@@ -191,7 +191,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 					db.setTransactionSuccessful();
 					db.endTransaction();
 					dObject.dbClose(db);
-					if(isDebug) Log.w(CNAME,"Prev has gone");
+					if(isDebug) Log.w(TAG,"Prev has gone");
 					saveTrace.saveDebug("Prev has gone");
 				} else {
 					if(prevTime == 0L){
@@ -214,14 +214,15 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.endTransaction();
 						dObject.dbClose(db);
 						
-						if(isDebug) Log.w(CNAME,"Decrease cpu time");
+						if(isDebug) Log.w(TAG,"Decrease cpu time");
 						saveTrace.saveDebug("ttl=" + totalTime + " pre=" + prevTime);
 					} else {
-						if(isDebug) Log.w(CNAME,"Async 3rd part");
-						//Log.w(CNAME,"t=" + totalTime + " p=" + prevTime);
+						if(isDebug) Log.w(TAG,"Async 3rd part");
+						//Log.w(TAG,"t=" + totalTime + " p=" + prevTime);
 						totalTime = totalTime - prevTime;
 						Long nTotalTime = 0L;
 						sql = "select name,ttime from " + PSXValue.PREVINFO;
+						sql += " where ttime is not null";
 						db = dObject.dbOpen();
 						cursor = dObject.dbQuery(db, sql);
 						for(int i = 0;i < finalList.size();i++){
@@ -239,7 +240,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 							//finalList.get(i).rtime = (double)totalTime;
 							finalList.get(i).rsize = (double)totalSize;
 							nTotalTime += finalList.get(i).ttime;
-							//Log.w(CNAME,"n=" + finalList.get(i).name + " t=" + finalList.get(i).ttime);
+							//Log.w(TAG,"n=" + finalList.get(i).name + " t=" + finalList.get(i).ttime);
 						}
 						dObject.dbClose(db);
 
@@ -252,10 +253,10 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 								finalList.get(i).rtime = (double)totalTime;
 							}
 						}
-						//	Log.e(CNAME,"nttl=" + nTotalTime + " ttl=" + totalTime);
+						//	Log.e(TAG,"nttl=" + nTotalTime + " ttl=" + totalTime);
 						//	saveTrace.saveDebug("nttl=" + nTotalTime + " ttl=" + totalTime);
 						//}						
-						if(isDebug) Log.w(CNAME,"Async 4th part");
+						if(isDebug) Log.w(TAG,"Async 4th part");
 						db = dObject.dbOpen();
 						db.beginTransaction();
 						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
@@ -267,7 +268,7 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						dObject.dbClose(db);
 
 						if(isDebug){
-							Log.w(CNAME,"End Second");
+							Log.w(TAG,"End Second");
 						}
 					}//totalTime <= prevTime
 				}//2nd execute
@@ -275,8 +276,8 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 			result.bResult = true;
 		} catch (Exception ex) {
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 			result.bResult = false;
 		}

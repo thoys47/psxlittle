@@ -12,7 +12,7 @@ import android.util.Log;
 import android.widget.ListView;
 
 public class DetailActivity extends Activity {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = PSXValue.isDebug;
 
 	@Override
@@ -46,7 +46,7 @@ public class DetailActivity extends Activity {
 			adapter = null;
 		}
 		if(isDebug){
-			Log.w(CNAME,"cnt=" + list.size());
+			Log.w(TAG,"cnt=" + list.size());
 		}
 		mListView.setAdapter(adapter);
 

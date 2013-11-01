@@ -32,7 +32,7 @@ import android.util.Log;
 public class ChartExecuter extends AbChart {
 
 	private ChartSettings mChartSettings;
-	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	private final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	private final static boolean isDebug = false;
 
 
@@ -55,7 +55,7 @@ public class ChartExecuter extends AbChart {
 			values.add(vtmp);
 		}
 		
-		if(isDebug) Log.w(CNAME,"x cnt=" + x.size());
+		if(isDebug) Log.w(TAG,"x cnt=" + x.size());
 		
 		XYMultipleSeriesRenderer renderer = buildRenderer(mChartSettings.colors, mChartSettings.styles, mChartSettings.lineWidth);
 		int length = renderer.getSeriesRendererCount();

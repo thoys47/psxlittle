@@ -8,14 +8,14 @@ import android.content.Intent;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
-	static String CNAME;
+	static String TAG;
 	final static boolean isDebug = PSXValue.isDebug;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO 自動生成されたメソッド・スタブ
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(context));
-		CNAME = CommTools.getLastPart(context.getClass().getName(),".");
+		TAG = CommTools.getLastPart(context.getClass().getName(),".");
 
 		String action = intent.getAction(); 
 		
@@ -34,7 +34,7 @@ public class BootReceiver extends BroadcastReceiver {
 			rTask.StartCommand();
 		}
 		if(isDebug){
-			Log.w(CNAME,"action=" + action);
+			Log.w(TAG,"action=" + action);
 		}
 		TraceLog saveLog = new TraceLog(context);
 		saveLog.saveDebug(CommTools.getLastPart(intent.getAction() ,"."));

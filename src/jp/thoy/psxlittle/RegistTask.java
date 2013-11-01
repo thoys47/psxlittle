@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class RegistTask {
 	
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = PSXValue.isDebug;
 	
 	Context mContext;
@@ -25,7 +25,7 @@ public class RegistTask {
 		Intent rIntent = new Intent(mContext,PSXService.class);
 		rIntent.setAction(PSXValue.REPEAT);
 		
-		AlarmManager mAlarmManager = (AlarmManager)mContext.getSystemService(Activity.ALARM_SERVICE);
+		AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Activity.ALARM_SERVICE);
 		PendingIntent pIntent = PendingIntent.getService(mContext, 0, rIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		PSXShared pShared = new PSXShared(mContext);
@@ -37,15 +37,15 @@ public class RegistTask {
 		calendar.add(Calendar.SECOND, (-1) * calendar.get(Calendar.SECOND));
 		
 		if(isDebug){
-			Log.w(CNAME,CommTools.CalendarToString(calendar, CommTools.TIMELONG));
+			Log.w(TAG,CommTools.CalendarToString(calendar, CommTools.TIMELONG));
 			//TraceLog saveLog = new TraceLog(mContext);
 			//saveLog.saveDebug("next:" + CommTools.CalendarToString(calendar, CommTools.TIMELONG));
 		}
 		
 		//mAlarmManager.cancel(pIntent);
-		mAlarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval * 1000 * 60, pIntent);
+		alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval * 1000 * 60, pIntent);
 		//mAlarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pIntent);
-		//Log.e(CNAME,"next:" + CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));
+		//Log.e(TAG,"next:" + CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));
 	}
 
 

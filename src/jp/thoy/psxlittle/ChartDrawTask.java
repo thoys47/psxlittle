@@ -22,7 +22,7 @@ import android.util.Log;
 import android.widget.LinearLayout;
 
 public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
-	private final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	private final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	private final static boolean isDebug = false;
 	
 	Context mContext;
@@ -54,7 +54,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		// TODO 自動生成されたメソッド・スタブ
 		super.onPreExecute();
 		pDialog = new ProgressDialog(mActivity);
-		pDialog.setMessage(mActivity.getString(R.string.strLoading));
+		pDialog.setMessage(mActivity.getString(R.string.msgLoading));
 		pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		pDialog.setCancelable(false);
 		pDialog.show();
@@ -114,7 +114,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 					break;
 			}
 			if(isDebug){
-				Log.w(CNAME,sql);
+				Log.w(TAG,sql);
 			}
 			
 			SQLiteDatabase db = dObject.dbOpen();
@@ -132,7 +132,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			double[] values = new double[totalnum];
 
 			if(isDebug){
-				Log.w(CNAME,"datanum = " + datanum + " totalnum = " + totalnum);
+				Log.w(TAG,"datanum = " + datanum + " totalnum = " + totalnum);
 			}
 
 			for(int i = 0; i < totalnum;i++){
@@ -150,7 +150,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				if(values[i] != MathHelper.NULL_VALUE){
 					if(values[i] * 1.3 > chartSettings.max){
 						chartSettings.max = (int)(values[i] * 1.3);
-						if(isDebug) Log.w(CNAME,"max on " + fString);
+						if(isDebug) Log.w(TAG,"max on " + fString);
 					}
 				}
 			}
@@ -169,8 +169,8 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 		} catch (Exception ex) {
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 		result.chartSettings = chartSettings;
@@ -184,7 +184,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			String datetime = cursor.getString(0);
 			if(datetime.compareTo(fString) >= 0 && datetime.compareTo(tString) < 0){
 				if(isDebug){
-					Log.w(CNAME,"date=" + datetime + " data=" + cursor.getString(1));
+					Log.w(TAG,"date=" + datetime + " data=" + cursor.getString(1));
 				}
 				switch(page){
 				case PSXValue.P_CPU:
@@ -201,7 +201,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			}
 			cursor.moveToNext();
 		}
-		//if(isDebug) Log.w(CNAME,"r="+ret);
+		//if(isDebug) Log.w(TAG,"r="+ret);
 		return ret;
 	}
 	

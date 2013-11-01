@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class PSXService extends Service {
-	static String CNAME;
+	static String TAG;
 	final static boolean isDebug = false;
 
 	@Override
@@ -18,14 +18,14 @@ public class PSXService extends Service {
 		Context context = getApplicationContext();
 		Thread.setDefaultUncaughtExceptionHandler(new TraceLog(context));
 
-		CNAME = CommTools.getLastPart(context.getClass().getName(),".");
+		TAG = CommTools.getLastPart(context.getClass().getName(),".");
 
 		PSXAsyncTask aTask = new PSXAsyncTask();
 		Param  param = new Param();
 		
 		if(isDebug) {
-			Log.w(CNAME,"c=" + context.toString());
-			Log.w(CNAME,"s=" + intent.getAction());
+			Log.w(TAG,"c=" + context.toString());
+			Log.w(TAG,"s=" + intent.getAction());
 		}
 		
 		param.cParam = context;

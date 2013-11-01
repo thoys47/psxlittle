@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class SummarizeData {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 	Context mContext;
 	
@@ -53,7 +53,7 @@ public class SummarizeData {
 				sql += " where key = '" + key + "'";
 			}
 			if(isDebug){
-				Log.w(CNAME,"sql=" + sql);
+				Log.w(TAG,"sql=" + sql);
 			}
 			Cursor cursor = dObject.dbQuery(db, sql);
 			if(cursor.getString(0) == null || cursor == null){
@@ -61,7 +61,7 @@ public class SummarizeData {
 				return null;
 			}
 			if(isDebug){
-				Log.w(CNAME,"cnt="+cursor.getString(0));
+				Log.w(TAG,"cnt="+cursor.getString(0));
 			}
 			long total = cursor.getLong(0);
 			if(key == null){
@@ -77,7 +77,7 @@ public class SummarizeData {
 						+ " where key = '" + key +"' group by name";
 			}
 			if(isDebug){
-				Log.w(CNAME,sql);
+				Log.w(TAG,sql);
 			}
 			cursor = dObject.dbQuery(db, sql);
 			if(cursor == null){
@@ -125,8 +125,8 @@ public class SummarizeData {
 			}
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 		return calList;

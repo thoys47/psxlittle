@@ -14,7 +14,7 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 
 public class DebugActivity extends Activity {
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 
 	@Override
@@ -50,7 +50,7 @@ public class DebugActivity extends Activity {
 				// TODO 自動生成されたメソッド・スタブ
 				int radio = checkedId;
 				Context context = getApplicationContext();
-				if(isDebug) Log.w(CNAME,"radio=" + radio);
+				if(isDebug) Log.w(TAG,"radio=" + radio);
 				switch(radio){
 					case R.id.debugTrace:
 					case R.id.debugLog:

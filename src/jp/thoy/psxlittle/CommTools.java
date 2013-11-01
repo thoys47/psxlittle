@@ -12,7 +12,7 @@ public class CommTools {
 	public final static String DATETIMESHORT = "YYYY/MM/DD HH:MM";
 	public final static String TIMELONG = "HH:MM:SS";
 	public final static String TIMESHORT = "HH:MM";
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = false;
 	
 	

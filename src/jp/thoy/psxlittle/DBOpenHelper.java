@@ -9,7 +9,7 @@ import android.util.Log;
 
 public class DBOpenHelper extends SQLiteOpenHelper {
 
-	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
 	final static boolean isDebug = PSXValue.isDebug;
 	Context mContext;
 
@@ -25,7 +25,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase mdb){
 		// TODO 自動生成されたメソッド・スタブ
-		if(isDebug) Log.w(CNAME,"enter helper");
+		if(isDebug) Log.w(TAG,"enter helper");
 		try{
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.INFOTABLE));
 			mdb.execSQL(DataObject.makeBaseSQL("CREATE",PSXValue.TEMPINFO));
@@ -43,11 +43,11 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
-		if(isDebug) Log.w(CNAME,"exit helper");
+		if(isDebug) Log.w(TAG,"exit helper");
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 		} catch (Exception ex){
 			TraceLog saveTrace = new TraceLog(mContext);
 			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
+			saveTrace.saveLog(ex,TAG + mname);
+			Log.e(TAG,ex.getMessage());
 			ex.printStackTrace();
 		}
 	}

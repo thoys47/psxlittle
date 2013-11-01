@@ -1,8 +1,5 @@
 package jp.thoy.psxlittle;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -183,6 +180,11 @@ public class DataObject {
 	public void insertInfo(SQLiteDatabase db,ArrayList<InfoTable> list,String tablename){
 
 		String sql = "";
+		
+		if(list.size() == 0) {
+			return;
+		}
+		
 		try{
 			sql = makeBaseSQL("INSERT",tablename);
 			if(tablename.equals(PSXValue.INFOTABLE) || tablename.equals(PSXValue.TEMPINFO)){
@@ -190,6 +192,8 @@ public class DataObject {
 			} else if(tablename.equals(PSXValue.PREVINFO)){
 				sql += "(?,?,?)";
 			}
+			
+			if(isDebug) Log.w(CNAME,"cnt=" + list.size());
 			
 			SQLiteStatement stmt = db.compileStatement(sql);
 			for(int i = 0;i < list.size();i++){
@@ -226,7 +230,7 @@ public class DataObject {
 					stmt.bindLong(3, list.get(i).ttime);
 				}
 				if(isDebug){
-					Log.w(CNAME,sql);
+					Log.w(CNAME,list.get(i).name);
 				}
 				stmt.execute();
 			}
@@ -260,83 +264,4 @@ public class DataObject {
 		return ret;
 	}
 
-	public int exportData(String name){
-		SQLiteDatabase mdb = null;
-		int ret = 0;
-
-		try {
-			File file = new File(mContext.getExternalFilesDir(null).toString() + "/" + name + ".csv");
-			String sql = makeBaseSQL("SELECT",name);
-			mdb = this.dbOpen();
-			Cursor cursor = this.dbQuery(mdb, sql);
-			if(cursor.getCount() != 0){
-				file.createNewFile();
-		        if (file != null && file.exists()) {
-		        	FileWriter fw = new FileWriter(file, false);
-		        	PrintWriter pw = new PrintWriter(fw,true);
-		        	
-		        	int num = 0;
-		        	String line = "";
-		        	if(name.equals(PSXValue.INFOTABLE)) {
-		        		num = PSXValue.infoColumn.length;
-		    			for(int j = 0;j < num;j++){
-		        			line += "\"";
-			        		line += PSXValue.infoColumn[j];
-		        			line += "\",";
-			        	}
-		        	} else if (name.equals(PSXValue.PREVINFO)){
-		        		num = PSXValue.prevColumn.length;
-		    			for(int j = 0;j < num;j++){
-		        			line += "\"";
-			        		line += PSXValue.prevColumn[j];
-			        		line += "\",";
-			        	}
-		        	} else if (name.equals(PSXValue.BATTINFO)){
-		        		num = PSXValue.battColumn.length;
-		    			for(int j = 0;j < num;j++){
-		        			line += "\"";
-			        		line += PSXValue.battColumn[j];
-			        		line += "\",";
-			        	}
-		        	}
-					line = line.substring(0, line.length() - 1);
-		        	pw.println(line);
-		        	
-		    		while(cursor.getPosition() < cursor.getCount()){
-		    			line = "";
-		    			for(int j = 0;j < num;j++){
-		    				switch(cursor.getType(j)){
-		    					case Cursor.FIELD_TYPE_INTEGER:
-					        		line += String.valueOf(cursor.getInt(j));
-					        		break;
-		    					case Cursor.FIELD_TYPE_FLOAT:
-					        		line += String.valueOf(cursor.getDouble(j));
-					        		break;
-		    					case Cursor.FIELD_TYPE_STRING:
-					        		line += "\"" + cursor.getString(j) + "\"";
-					        		break;
-					        	default :
-					        		line += "\"" + cursor.getString(j) + "\"";
-		    				}
-			        		if(j != num - 1) {
-			        			line += ",";
-			        		}
-			        	}
-			        	pw.println(line);
-			        	ret++;
-			        	cursor.moveToNext();
-		    		}
-		        	pw.close();
-		        } 
-			}
-			this.dbClose(mdb);
-		} catch (Exception ex) {
-			TraceLog saveTrace = new TraceLog(mContext);
-			String mname = ":" + Thread.currentThread().getStackTrace()[2].getMethodName();
-			saveTrace.saveLog(ex,CNAME + mname);
-			Log.e(CNAME,ex.getMessage());
-			ex.printStackTrace();
-		}
-		return ret;
-	}
 }

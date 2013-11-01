@@ -35,13 +35,17 @@
     <string name="ttlMEM">Memory info</string>
     <string name="ttlBATT">Battery info</string>
 	<string name="strTap">Tap to choose a file</string>
+	<string name="msgImport">Imported count is </string>
     <string name="msgExport">Exported to </string>
+    <string name="msgNotFound">File not Found</string>
     <string name="ttlRate">Rate(%)</string>
     <string name="ttlTime">Time</string>
     <string name="strChoose">Choose File</string>
     <string name="btnOK">OK</string>
     <string name="btnCancel">Cancel</string>
     <string name="strPath">Current Path</string>
+    <string name="fileHeader">Header Error at </string>
+    <string name="fileFormat">Format Error at </string>
     
     
 </resources>

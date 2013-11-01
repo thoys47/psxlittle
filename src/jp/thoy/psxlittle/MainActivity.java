@@ -234,7 +234,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		    	startActivity(mIntent);
 				break;
 			/*
-			case R.id.action_import:
+			case R.id.action_mainte:
 				mIntent = new Intent(this, HandleDataActivity.class);
 		    	startActivity(mIntent);
 				break;

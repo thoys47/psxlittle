@@ -98,14 +98,14 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			String sql = "";
 			switch(page){
 				case PSXValue.P_CPU:
-					sql = "select datetime,sum(ttime)/rtime from " + PSXValue.INFOTABLE
-					+ " where key = '" + params[0].key + "' and rtime > 0 and datetime >= '" + fString + "'"
-					+ " group by key,datetime order by datetime";
+					sql = "select datetime,sum(ttime)/sum(rtime) from " + PSXValue.INFOTABLE
+					+ " where key = '" + params[0].key + "' and rtime > 0 and rtime is not null and datetime >= '" 
+					+ fString + "'" + " group by key,datetime order by datetime";
 					break;
 				case PSXValue.P_MEM:	
-					sql = "select datetime,sum(tsize)/rsize from " + PSXValue.INFOTABLE
-					+ " where key = '" + params[0].key + "' and rsize > 0 and datetime >= '" + fString + "'"
-					+ " group by key,datetime order by datetime";
+					sql = "select datetime,sum(tsize)/sum(rsize) from " + PSXValue.INFOTABLE
+					+ " where key = '" + params[0].key + "' and rsize > 0 and rsize is not null and datetime >= '"
+					+ fString + "'" + " group by key,datetime order by datetime";
 					break;
 				case PSXValue.P_BATT:
 					sql = "select datetime,max(level),max(status),max(plugged) from " + PSXValue.BATTINFO
@@ -150,6 +150,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 				if(values[i] != MathHelper.NULL_VALUE){
 					if(values[i] * 1.3 > chartSettings.max){
 						chartSettings.max = (int)(values[i] * 1.3);
+						if(isDebug) Log.w(CNAME,"max on " + fString);
 					}
 				}
 			}
@@ -200,7 +201,7 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			}
 			cursor.moveToNext();
 		}
-		if(isDebug) Log.w(CNAME,"r="+ret);
+		//if(isDebug) Log.w(CNAME,"r="+ret);
 		return ret;
 	}
 	

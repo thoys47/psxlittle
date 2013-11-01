@@ -126,7 +126,7 @@
             android:text="@string/strPrev" />
 
         <RadioButton
-            android:id="@+id/radioBarr"
+            android:id="@+id/radioBatt"
             style="@style/listMidium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

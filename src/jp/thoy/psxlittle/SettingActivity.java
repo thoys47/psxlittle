@@ -24,7 +24,8 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 
 		RadioGroup rInterval = (RadioGroup)findViewById(R.id.radioInterval);
 		RadioGroup rLength = (RadioGroup)findViewById(R.id.radioLength);
-	
+		RadioGroup rCount = (RadioGroup)findViewById(R.id.radioCount);
+		
 		switch(interval){
 		case PSXValue.MIN10:
 			rInterval.check(R.id.radio10);
@@ -56,6 +57,7 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 		
 		rInterval.setOnCheckedChangeListener(this);
 		rLength.setOnCheckedChangeListener(this);
+		rCount.setOnCheckedChangeListener(this);
 	}
 
 	@Override
@@ -110,6 +112,9 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 						break;
 					case R.id.radioPrev:
 						name = PSXValue.PREVINFO;
+						break;
+					case R.id.radioBatt:
+						name = PSXValue.BATTINFO;
 						break;
 					default:
 						name = PSXValue.INFOTABLE;	

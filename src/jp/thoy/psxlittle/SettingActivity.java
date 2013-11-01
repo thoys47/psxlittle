@@ -1,13 +1,12 @@
 package jp.thoy.psxlittle;
 
-import jp.thoy.psxlittle.R;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Toast;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class SettingActivity extends Activity implements OnCheckedChangeListener {
 	final String CNAME = CommTools.getLastPart(this.getClass().getName(),".");
@@ -24,9 +23,7 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 		int length = pShared.getLength();
 
 		RadioGroup rInterval = (RadioGroup)findViewById(R.id.radioInterval);
-		RadioGroup rCount = (RadioGroup)findViewById(R.id.radioCount);
 		RadioGroup rLength = (RadioGroup)findViewById(R.id.radioLength);
-		RadioGroup rExport = (RadioGroup)findViewById(R.id.radioExport);
 	
 		switch(interval){
 		case PSXValue.MIN10:
@@ -59,22 +56,20 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 		
 		rInterval.setOnCheckedChangeListener(this);
 		rLength.setOnCheckedChangeListener(this);
-		rCount.setOnCheckedChangeListener(this);
-		rExport.setOnCheckedChangeListener(this);
 	}
 
 	@Override
 	public void onCheckedChanged(RadioGroup group, int checkedId) {
 		// TODO 自動生成されたメソッド・スタブ
-		String name;
 		int interval;
 		int length;
 		Context context = getApplicationContext();
 
 		PSXShared pShared = new PSXShared(context);
 		int groupId =  group.getId();
+		String name;
 		DataObject dObject = new DataObject(context);
-		
+
 		switch(groupId){
 			case R.id.radioInterval:
 				switch(checkedId){
@@ -121,27 +116,6 @@ public class SettingActivity extends Activity implements OnCheckedChangeListener
 				}
 				Toast.makeText(context,String.valueOf(dObject.countTable(name)),Toast.LENGTH_SHORT).show();
 				break;
-			case R.id.radioExport:
-				switch(checkedId){
-					case R.id.radioExInfo:
-						name = PSXValue.INFOTABLE;
-						break;
-					case R.id.radioExPrev:
-						name = PSXValue.PREVINFO;
-						break;
-					case R.id.radioExBatt:
-						name = PSXValue.BATTINFO;
-						break;
-					default:
-						name = PSXValue.INFOTABLE;
-				}
-				Log.w(CNAME,name);
-				dObject.exportData(name);
-				Toast.makeText(context, getString(R.string.msgExport) + getExternalFilesDir(null).toString()
-						,Toast.LENGTH_LONG).show();
-				break;
 		}
-		
-
 	}
 }

@@ -8,17 +8,25 @@
         android:title="@string/action_reload"/>
     
     <item
-        android:id="@+id/action_debug"
-        android:orderInCategory="100"
-        android:showAsAction="ifRoom"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="@string/action_debug" />
-    
-    <item
         android:id="@+id/action_setting"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/action_settings"/>
+    
+    <item
+        android:id="@+id/action_debug"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/action_debug" />
+    
+    <!-- item
+        android:id="@+id/action_mainte"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/action_mainte" /-->
+    
     
 </menu>

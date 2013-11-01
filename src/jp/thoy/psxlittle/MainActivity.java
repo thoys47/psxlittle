@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import jp.thoy.psxlittle.R;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -227,14 +225,20 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 					mListView.setOnItemLongClickListener(this);
 				}
 				break;
-			case R.id.action_debug:
-				mIntent = new Intent(this, DebugActivity.class);
-		    	startActivity(mIntent);
-				break;
 			case R.id.action_setting:
 				mIntent = new Intent(this, SettingActivity.class);
 		    	startActivity(mIntent);
 				break;
+			case R.id.action_debug:
+				mIntent = new Intent(this, DebugActivity.class);
+		    	startActivity(mIntent);
+				break;
+			/*
+			case R.id.action_import:
+				mIntent = new Intent(this, HandleDataActivity.class);
+		    	startActivity(mIntent);
+				break;
+			*/
 			default:
 					;
 		}
@@ -250,17 +254,11 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 		ViewPager vPager = (ViewPager)findViewById(R.id.viewPager);
 		Intent intent;
 		if(isDebug) Log.w(CNAME,"getText=" + tView.getText());
-		//if(!tView.getText().equals("root") && !tView.getText().equals("system")){ 
-			intent = new Intent(view.getContext(),ChartActivity.class);
-			intent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-			intent.putExtra("KEY",tView.getText());
-			startActivity(intent);
-		//} else {
-		//	mIntent = new Intent(view.getContext(),DetailActivity.class);
-		//	mIntent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
-		//	mIntent.putExtra("KEY",tView.getText());
-		//	startActivity(mIntent);
-		//}
+		intent = new Intent(view.getContext(),ChartActivity.class);
+		intent.putExtra("PAGE",String.valueOf(vPager.getCurrentItem()));
+		intent.putExtra("KEY",tView.getText());
+		startActivity(intent);
+
 	}
 
 	@Override

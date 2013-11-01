@@ -205,6 +205,10 @@ public class PSXAsyncTask extends AsyncTask<Param, Integer, Result> {
 						db.beginTransaction();
 						dObject.doSQL(db,"delete from " + PSXValue.PREVINFO);
 						dObject.insertInfo(db,prevList, PSXValue.PREVINFO);
+						for(int i = 0;i < finalList.size();i++){
+							finalList.get(i).rtime = (double)totalTime;
+							finalList.get(i).rsize = (double)totalSize;
+						}
 						dObject.insertInfo(db,finalList, PSXValue.INFOTABLE);
 						db.setTransactionSuccessful();
 						db.endTransaction();

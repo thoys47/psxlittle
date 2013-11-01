@@ -4,12 +4,13 @@
     <string name="app_name">PSXLittle</string>
     <string name="action_settings">Settings</string>
     <string name="action_reload">Reload</string>
+    <string name="action_debug">Debug</string>
+    <string name="action_mainte">Maintenance</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
     <string name="lblTrace">Show TraceFile</string>
     <string name="lblDebug">Show DebugLog</string>
-    <string name="action_debug">Debug</string>
     <string name="strnone2">no Strings</string>
     <string name="lblDescription">icon</string>
     <string name="strLoading">Loading</string>
@@ -29,11 +30,18 @@
     <string name="strPrev">PrevTable</string>
     <string name="strBatt">BattTable</string>
     <string name="strExport">Export Data</string>
+    <string name="strImport">Import Data</string>
     <string name="ttlCPU">CPU info</string>
     <string name="ttlMEM">Memory info</string>
     <string name="ttlBATT">Battery info</string>
+	<string name="strTap">Tap to choose a file</string>
     <string name="msgExport">Exported to </string>
     <string name="ttlRate">Rate(%)</string>
     <string name="ttlTime">Time</string>
+    <string name="strChoose">Choose File</string>
+    <string name="btnOK">OK</string>
+    <string name="btnCancel">Cancel</string>
+    <string name="strPath">Current Path</string>
+    
     
 </resources>

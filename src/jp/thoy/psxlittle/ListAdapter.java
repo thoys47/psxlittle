@@ -21,13 +21,13 @@ import android.widget.TextView;
 
 public class ListAdapter extends ArrayAdapter<TempTable> {
 
-	LayoutInflater mInflater;
+	LayoutInflater inflater;
 	PackageManager mPackageManager;
 	
 	public ListAdapter(Context context, ArrayList<TempTable> objects,PackageManager pm) {
 		super(context, 0, objects);
 		// TODO 自動生成されたコンストラクター・スタブ
-		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mPackageManager = pm;
 	}
 	@Override
@@ -38,7 +38,7 @@ public class ListAdapter extends ArrayAdapter<TempTable> {
 
 	public View getView(final int position,View convertView,ViewGroup parent){
 		if(convertView == null){
-			convertView = mInflater.inflate(R.layout.rows,null);
+			convertView = inflater.inflate(R.layout.rows,null);
 		}
 		
 		final TempTable item = this.getItem(position);

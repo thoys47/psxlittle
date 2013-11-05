@@ -74,7 +74,7 @@ public class SummarizeData {
 						+ ",max(" + sumColumn + "/" + divColumn + ")"
 						+ ",avg(" + sumColumn + "/" + divColumn + ")" 
 						+ " from " + PSXValue.INFOTABLE
-						+ " where key = '" + key +"' group by name";
+						+ " where key = '" + key + "' group by name";
 			}
 			if(isDebug){
 				Log.w(TAG,sql);

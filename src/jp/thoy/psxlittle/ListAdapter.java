@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ListAdapter extends ArrayAdapter<TempTable> {
+	final String TAG = CommTools.getLastPart(this.getClass().getName(),".");
+	final static boolean isDebug = false;
 
 	LayoutInflater inflater;
 	PackageManager mPackageManager;
@@ -84,6 +87,8 @@ public class ListAdapter extends ArrayAdapter<TempTable> {
 						mSysName.setText(item.SysName);
 						mKey.setText(item.key);
 					}
+					//mAvg.setText(String.format("%.2f",item.max) + "%");
+					if(isDebug) Log.w(TAG,"key=@" + item.key + "@");
 				} else {
 					mIcon.setImageDrawable(resource.getDrawable(R.drawable.ic_android));
 					mAppName.setText(item.AppName);
@@ -91,7 +96,6 @@ public class ListAdapter extends ArrayAdapter<TempTable> {
 					mKey.setText(item.key);
 				}
 				mSum.setText(String.format("%.2f",item.sum) + "%");
-				mAvg.setText(String.format("%.2f",item.max) + "%");
 			} else {
 				mIcon.setImageDrawable(null);
 			}

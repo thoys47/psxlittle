@@ -98,12 +98,12 @@ public class ChartDrawTask extends AsyncTask<Param, Integer, Result> {
 			String sql = "";
 			switch(page){
 				case PSXValue.P_CPU:
-					sql = "select datetime,sum(ttime)/sum(rtime) from " + PSXValue.INFOTABLE
+					sql = "select datetime,sum(ttime)/rtime from " + PSXValue.INFOTABLE
 					+ " where key = '" + params[0].key + "' and rtime > 0 and rtime is not null and datetime >= '" 
 					+ fString + "'" + " group by key,datetime order by datetime";
 					break;
 				case PSXValue.P_MEM:	
-					sql = "select datetime,sum(tsize)/sum(rsize) from " + PSXValue.INFOTABLE
+					sql = "select datetime,sum(tsize)/rsize from " + PSXValue.INFOTABLE
 					+ " where key = '" + params[0].key + "' and rsize > 0 and rsize is not null and datetime >= '"
 					+ fString + "'" + " group by key,datetime order by datetime";
 					break;

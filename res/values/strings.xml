@@ -10,7 +10,6 @@
     <string name="lblDebug">Show DebugLog</string>
     <string name="lblDescription">icon</string>
     <string name="lblLength">How Long?</string>
-    <string name="lblInterval">Interval</string>
     <string name="lblExport">Export Data</string>
     <string name="lblImport">Import Data</string>
 	<string name="lblCount">Toast Count</string>
@@ -18,6 +17,7 @@
     <string name="ttlMEM">Memory info</string>
     <string name="ttlBATT">Battery info</string>
     <string name="ttlRate">Rate(%)</string>
+    <string name="ttlInterval">Interval</string>
     <string name="ttlTime">Time</string>
     <string name="strnone2">no Strings</string>
     <string name="str10">10min</string>

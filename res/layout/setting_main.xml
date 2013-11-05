@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_h"
         android:layout_marginTop="@dimen/margin_v"
-        android:text="@string/lblInterval"
+        android:text="@string/ttlInterval"
         android:textAppearance="@style/listMidium" />
 	
 	<RadioGroup

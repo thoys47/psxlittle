@@ -46,6 +46,9 @@ public class RegistTask {
 		alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), interval * 1000 * 60, pIntent);
 		//mAlarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pIntent);
 		//Log.e(TAG,"next:" + CommTools.CalendarToString(calendar, CommTools.DATETIMELONG));
+		Intent dIntent = new Intent(mContext,DataDeleteService.class);
+		PendingIntent pdIntent = PendingIntent.getService(mContext, 0, dIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, pdIntent);
 	}
 
 
